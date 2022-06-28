@@ -32,31 +32,35 @@ from django.core.exceptions import ValidationError
 
 class RegisterModelForm(forms.ModelForm):
     # model里的verbose_name可以被覆写
-    phone = forms.CharField(label="手机号（被覆写）",
-                            validators=[RegexValidator(r'^(1|3|4|5|6|7|8|9)d{9}$',
-                                                       "手机号格式错误")]
-                            )
 
     # 密码输入框
     password = forms.CharField(label="密码",
                                widget=forms.PasswordInput
                                    (attrs={
-                                               # 'class': 'form-control',
-                                               'placeholder': '提示文字'
-                                          }
-                                   )
+                                   # 'class': 'form-control',
+                                   'placeholder': '提示文字'
+                               }
+                               )
                                )
 
     # 下面的字段没有定义在model.py里，因此不会被迁移到数据库中
     confirm_password = forms.CharField(label="重复密码", widget=forms.PasswordInput())
 
+    phone = forms.CharField(label="手机号（被覆写）",
+                            validators=[RegexValidator(r'^(1|3|4|5|6|7|8|9)d{9}$',
+                                                       "手机号格式错误")]
+                            )
+
     code = forms.CharField(
-        label = '验证码',
+        label='验证码',
         widget=forms.TextInput()
     )
+
     class Meta:
         model = models.UserInfo
-        fields = "__all__"
+        # fields = "__all__" # 用默认顺序展示所有字段
+        fields = ['username', 'email', 'password', 'confirm_password',
+                  'phone', 'code'] # 自定义显示字段的顺序
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
