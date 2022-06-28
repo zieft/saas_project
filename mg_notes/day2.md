@@ -40,7 +40,7 @@ app01/views.py:
 ##### 后端向前端传form
 
 ```python
-return render(request, 'register.html', {'form': form})
+return render(request, 'app01/templates/app01/register.html', {'form': form})
 ```
 
 app01/templates/register.html
