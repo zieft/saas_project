@@ -18,8 +18,8 @@ from django.contrib import admin
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'^app01', include('app01.urls', namespace='app01')),  # 路由分发，默认去app01的urls.py去找
+    url(r'^app01/', include('app01.urls', namespace='app01')),  # 路由分发，默认去app01的urls.py去找
     # namespace的作用是，在反向解析用到name的时候，不会因为重名的name而找到错误的路由
-    url(r'^/', include('web.urls')),  # 路由分发，不带任何app前缀的，默认去web的urls.py去找
+    url(r'^', include('web.urls')),  # 路由分发，不带任何app前缀的，默认去web的urls.py去找
 
 ]
