@@ -37,7 +37,7 @@ class RegisterModelForm(forms.ModelForm):
         model = models.UserInfo
         # fields = "__all__" # 用默认顺序展示所有字段
         fields = ['username', 'email', 'password', 'confirm_password',
-                  'mobile_phone', 'code']  # 自定义显示字段的顺序
+                  'phone', 'code']  # 自定义显示字段的顺序
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -72,7 +72,7 @@ class SendSmsForm(forms.Form):
 
         # 校验数据库中是否已有手机号
         # mobile_phone=mobile_phone 第一个是model.py里的，第二个就是上面刚定义的
-        exist = models.UserInfo.objects.filter(mobile_phone=mobile_phone).exist()
+        exist = models.UserInfo.objects.filter(phone=mobile_phone).exist()
         if exist:
             raise ValueError("手机号已存在")
         return mobile_phone
