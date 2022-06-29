@@ -16,17 +16,8 @@ def send_sms(request):
 
     form = SendSmsForm(request, data=request.GET)
 
-
-
-
     # 只校验手机号：不能为空，格式是否正确。
     # 不会校验手机号是否已被注册，相关校验在SendSmsForm里的钩子函数里进行
-
-
-
     if form.is_valid():
         pass
-
-
-
     return HttpResponse('成功')
