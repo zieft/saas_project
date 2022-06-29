@@ -24,7 +24,8 @@
                         <div class="clearfix">
                             <div class="col-md-7" style="padding-left: 0;">{{ field }}</div>
                             <div class="col-md-5">
-                                <button type="submit" class="btn btn-default">点击获取验证码</button>
+                                <!--<button type="submit" class="btn btn-default">点击获取验证码</button>-->
+                                <input id="btnSms" type="button" class="btn btn-default" value="点击获取验证码"> <!--id="btnSms"用于下面JavaScript绑定事件-->
                             </div>
                         </div>
 
@@ -47,6 +48,37 @@
 {% endblock %}
 
 {% block js %}
+    <script>
+        // 页面框架加载完成后自动执行的函数
+        $(function (){
+            bindClickSms()
+        });
 
+        /*
+        * 点击获取验证码的按钮绑定事件
+        * */
+        function bindClickSms(){
+            $('#btnSms').click(function (){
+                // 获取用户输入的手机号
+                // 从后端通过form传到前端的phone输入框没有显示的id，应该如何获取？
+                // 通过浏览器的检查源码功能，可以看到，phone输入框有一个id，是required id = id_phone
+                // 所以，form字段默认会在前端生成id：格式id_属性名
+                var mobilePhone = ($('#id_phone').val());
+
+                // 发送ajax请求
+                $.ajax({
+                    url: "{% url 'send_sms' %}", // http://www.xxx.com/index/?k1=123&k2=567
+                    type: "GET",
+                    // data: {k1: 123, k2: 567},
+                    data: { mobilePhone: mobilePhone, tpl: "register"},
+                    success: function (res){
+                        // 如果ajax请求发送成功，并且获得后端返回来的res，则自动执行本函数
+                        console.log(res);
+                    }
+                })
+            })
+
+        }
+    </script>
 
 {% endblock %}
