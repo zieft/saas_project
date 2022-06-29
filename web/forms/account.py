@@ -3,6 +3,8 @@
 from django import forms
 from web import models
 from django.core.validators import RegexValidator
+from django.core.exceptions import ValidationError
+from django.conf import settings
 
 
 class RegisterModelForm(forms.ModelForm):
@@ -35,7 +37,7 @@ class RegisterModelForm(forms.ModelForm):
         model = models.UserInfo
         # fields = "__all__" # 用默认顺序展示所有字段
         fields = ['username', 'email', 'password', 'confirm_password',
-                  'phone', 'code']  # 自定义显示字段的顺序
+                  'mobile_phone', 'code']  # 自定义显示字段的顺序
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -44,3 +46,33 @@ class RegisterModelForm(forms.ModelForm):
             # name是变量名，field就是name变量里保存的对象，比如CharField对象
             field.widget.attrs['class'] = 'form-control'
             field.widget.attrs["placeholder"] = '请输入%s' % (field.label)
+
+
+class SendSmsForm(forms.Form):
+    def __init__(self, request, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.request = request  # 这样一来，我们就可以在钩子函数中使用self.request.GET.get()方法了
+
+    # 为什么不用ModelForm? 因为sendsms里面处理的数据 mobilePhone 和 tpl 跟数据库没有关系
+    mobile_phone = forms.CharField(label='手机号', validators=[RegexValidator(r'^(1|3|4|5|6|7|8|9)d{9}$',
+                                                                           "手机号格式错误")])
+
+    def clean_mobile_phone(self):
+        """
+        钩子方法，手机号进行校验的钩子
+        :return:
+        """
+        mobile_phone = self.cleaned_data['mobile_phone']
+
+        # 判断模板是否有问题
+        tpl = self.request.GET.get("tpl")
+        template_id = settings.TENCENT_SMS_TEMPLATE.get('tpl')
+        if not template_id:
+            raise ValidationError("模板不存在")
+
+        # 校验数据库中是否已有手机号
+        # mobile_phone=mobile_phone 第一个是model.py里的，第二个就是上面刚定义的
+        exist = models.UserInfo.objects.filter(mobile_phone=mobile_phone).exist()
+        if exist:
+            raise ValueError("手机号已存在")
+        return mobile_phone

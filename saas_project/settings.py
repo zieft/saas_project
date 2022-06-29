@@ -124,6 +124,16 @@ STATIC_URL = '/static/'
 
 # 短信模板
 SMS = 0
+TENCENT_SMS_APP_ID = 666666
+
+TENCENT_SMS_APP_KEY = '66666666666666666'
+
+TENCENT_SMS_SIGN = 'SAAS auto SMS Service'
+
+TENCENT_SMS_TEMPLATE = {
+    'register' : 548760,
+    'login': 548762
+}
 
 try:
     from .local_settings import *
