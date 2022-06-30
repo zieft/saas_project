@@ -1,11 +1,14 @@
 # views中所用到的所有ModelForm，都放在forms文件夹中，方便管理
 
+import random
 from django import forms
 from web import models
 from django.core.validators import RegexValidator
 from django.core.exceptions import ValidationError
 from django.conf import settings
 
+from utils.tencent.sms import send_sms_single
+from django_redis import get_redis_connection
 
 class RegisterModelForm(forms.ModelForm):
     # model里的verbose_name可以被覆写
@@ -75,4 +78,16 @@ class SendSmsForm(forms.Form):
         exist = models.UserInfo.objects.filter(phone=mobile_phone).exist()
         if exist:
             raise ValueError("手机号已存在")
+
+        #
+        code = random.randrange(1000, 9999)
+        # 发短信
+        sms = send_sms_single(mobile_phone, template_id, [code, ])
+        if sms['result'] != 0: # 0代表发送成功
+            raise ValidationError('短信发送失败，{}'.format(sms['errmsg']))
+
+        # 写入redis（django-redis）
+        conn = get_redis_connection()
+        conn.set(mobile_phone, code, ex=300)
+
         return mobile_phone
