@@ -40,7 +40,7 @@ class RegisterModelForm(forms.ModelForm):
         model = models.UserInfo
         # fields = "__all__" # 用默认顺序展示所有字段
         fields = ['username', 'email', 'password', 'confirm_password',
-                  'phone', 'code']  # 自定义显示字段的顺序
+                  'mobile_phone', 'code']  # 自定义显示字段的顺序
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
