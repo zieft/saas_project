@@ -27,4 +27,4 @@ def send_sms(request):
         # 如果校验通过，说明forms里面定义的所有步骤都完成了，包括发短息、写入redis
         return JsonResponse({'status': True})
 
-    return JsonResponse({'status': False, 'error': form.erros})
+    return JsonResponse({'status': False, 'error': form.errors})

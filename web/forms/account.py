@@ -26,10 +26,10 @@ class RegisterModelForm(forms.ModelForm):
     # 下面的字段没有定义在model.py里，因此不会被迁移到数据库中
     confirm_password = forms.CharField(label="重复密码", widget=forms.PasswordInput())
 
-    phone = forms.CharField(label="手机号",
-                            validators=[RegexValidator(r'^(1|3|4|5|6|7|8|9)d{9}$',
+    mobile_phone = forms.CharField(label="手机号",
+                                   validators=[RegexValidator(r'^(1|3|4|5|6|7|8|9)d{9}$',
                                                        "手机号格式错误")]
-                            )
+                                   )
 
     code = forms.CharField(
         label='验证码',
@@ -75,7 +75,7 @@ class SendSmsForm(forms.Form):
 
         # 校验数据库中是否已有手机号
         # mobile_phone=mobile_phone 第一个是model.py里的，第二个就是上面刚定义的
-        exist = models.UserInfo.objects.filter(phone=mobile_phone).exist()
+        exist = models.UserInfo.objects.filter(mobile_phone=mobile_phone).exist()
         if exist:
             raise ValueError("手机号已存在")
 
@@ -83,6 +83,7 @@ class SendSmsForm(forms.Form):
         code = random.randrange(1000, 9999)
         # 发短信
         sms = send_sms_single(mobile_phone, template_id, [code, ])
+
         if sms['result'] != 0: # 0代表发送成功
             raise ValidationError('短信发送失败，{}'.format(sms['errmsg']))
 

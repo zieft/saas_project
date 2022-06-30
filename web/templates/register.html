@@ -7,12 +7,19 @@
 
 {% block css %}
     <link rel="stylesheet" href="{% static 'css/account.css' %}">
+    <style>
+    .error-msg{
+        color: red;
+        position: absolute;
+        font-size: 13px;
+    }
+    </style>
 {% endblock %}
 
 {% block content %}
     <div class="account">
         <h1 style="text-align: center">注册</h1>
-        <form>
+        <form id="form", method="post" novalidate>
         {% csrf_token %}
             {% for field in form %}
                 {% if field.name == 'code' %}
@@ -22,7 +29,10 @@
                         <!--form-control样式就是美化输入框的关键元素，同样可以在ModelForm中定义-->
                         <!--input type="email" class="form-control" id="exampleInputEmail1" placeholder="Email"-->
                         <div class="clearfix">
-                            <div class="col-md-7" style="padding-left: 0;">{{ field }}</div>
+                            <div class="col-md-7" style="padding-left: 0;">
+                                {{ field }}
+                                <span class="error-msg"></span>
+                            </div>
                             <div class="col-md-5">
                                 <!--<button type="submit" class="btn btn-default">点击获取验证码</button>-->
                                 <input id="btnSms" type="button" class="btn btn-default" value="点击获取验证码"> <!--id="btnSms"用于下面JavaScript绑定事件-->
@@ -37,6 +47,8 @@
                         <!--form-control样式就是美化输入框的关键元素，同样可以在ModelForm中定义-->
                         <!--input type="email" class="form-control" id="exampleInputEmail1" placeholder="Email"-->
                         {{ field }}
+                        <span class="error-msg"></span>
+{#                        上面的span标签就是手机号输入框错误信息要展示的地方#}
                     </div>
                 {% endif %}
             {% endfor %}
@@ -59,6 +71,7 @@
         * */
         function bindClickSms(){
             $('#btnSms').click(function (){
+                $('.error-msg').empty(); // 每次用户点击按钮，先清除错误信息
                 // 获取用户输入的手机号
                 // 从后端通过form传到前端的phone输入框没有显示的id，应该如何获取？
                 // 通过浏览器的检查源码功能，可以看到，phone输入框有一个id，是required id = id_phone
@@ -71,9 +84,21 @@
                     type: "GET",
                     // data: {k1: 123, k2: 567},
                     data: { mobilePhone: mobilePhone, tpl: "register"},
+                    dataType: "JSON", // 将服务端返回的数据序列字符串 变成 JSON格式
                     success: function (res){
                         // 如果ajax请求发送成功，并且获得后端返回来的res，则自动执行本函数
-                        console.log(res);
+                        if(res.status){
+                            console.log("发送成功，进入倒计时")
+
+                        }else{
+                            // 错误信息
+                            console.log(res); // {status:False, error:{mobile_phone:["错误信息"]}}
+                            // $.each是jquery提供的for循环方法,
+                            // 遍历所有res.error，每循环一次执行一次function
+                            $.each(res.error,function (key,value){
+                                $('#id_' + key).next().text(value) // 找id_mobile_phone标签下面的span标签，并显示错误信息
+                            })
+                        }
                     }
                 })
             })
