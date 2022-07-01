@@ -65,7 +65,8 @@ class SendSmsForm(forms.Form):
 
         # 判断模板是否有问题
         tpl = self.request.GET.get("tpl")
-        template_id = settings.TENCENT_SMS_TEMPLATE.get('tpl')
+        template_id = settings.TENCENT_SMS_TEMPLATE.get(tpl)
+        # template_id = 548760
         if not template_id:
             raise ValidationError("模板不存在")
 
