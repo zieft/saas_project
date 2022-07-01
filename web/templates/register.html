@@ -47,8 +47,7 @@
                         <!--form-control样式就是美化输入框的关键元素，同样可以在ModelForm中定义-->
                         <!--input type="email" class="form-control" id="exampleInputEmail1" placeholder="Email"-->
                         {{ field }}
-                        <span class="error-msg"></span>
-{#                        上面的span标签就是手机号输入框错误信息要展示的地方#}
+                        <span class="error-msg"></span><!--这个span里面就会显示错误信息-->
                     </div>
                 {% endif %}
             {% endfor %}
@@ -76,14 +75,14 @@
                 // 从后端通过form传到前端的phone输入框没有显示的id，应该如何获取？
                 // 通过浏览器的检查源码功能，可以看到，phone输入框有一个id，是required id = id_phone
                 // 所以，form字段默认会在前端生成id：格式id_属性名
-                var mobilePhone = ($('#id_phone').val());
+                var mobilePhone = ($('#id_mobile_phone').val());
 
                 // 发送ajax请求
                 $.ajax({
                     url: "{% url 'send_sms' %}", // http://www.xxx.com/index/?k1=123&k2=567
                     type: "GET",
                     // data: {k1: 123, k2: 567},
-                    data: { mobilePhone: mobilePhone, tpl: "register"},
+                    data: { mobile_phone: mobilePhone, tpl: "register"},
                     dataType: "JSON", // 将服务端返回的数据序列字符串 变成 JSON格式
                     success: function (res){
                         // 如果ajax请求发送成功，并且获得后端返回来的res，则自动执行本函数

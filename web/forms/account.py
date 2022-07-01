@@ -26,10 +26,7 @@ class RegisterModelForm(forms.ModelForm):
     # 下面的字段没有定义在model.py里，因此不会被迁移到数据库中
     confirm_password = forms.CharField(label="重复密码", widget=forms.PasswordInput())
 
-    mobile_phone = forms.CharField(label="手机号",
-                                   validators=[RegexValidator(r'^(1|3|4|5|6|7|8|9)d{9}$',
-                                                       "手机号格式错误")]
-                                   )
+    mobile_phone = forms.CharField(label="手机号", validators=[RegexValidator(r'^(1[3|4|5|6|7|8|9])\d{9}$', "手机号格式错误"), ])
 
     code = forms.CharField(
         label='验证码',
@@ -57,8 +54,7 @@ class SendSmsForm(forms.Form):
         self.request = request  # 这样一来，我们就可以在钩子函数中使用self.request.GET.get()方法了
 
     # 为什么不用ModelForm? 因为sendsms里面处理的数据 mobilePhone 和 tpl 跟数据库没有关系
-    mobile_phone = forms.CharField(label='手机号', validators=[RegexValidator(r'^(1|3|4|5|6|7|8|9)d{9}$',
-                                                                           "手机号格式错误")])
+    mobile_phone = forms.CharField(label='手机号', validators=[RegexValidator(r'^(1[3|4|5|6|7|8|9])\d{9}$', "手机号格式错误"), ])
 
     def clean_mobile_phone(self):
         """

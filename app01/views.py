@@ -46,10 +46,7 @@ class RegisterModelForm(forms.ModelForm):
     # 下面的字段没有定义在model.py里，因此不会被迁移到数据库中
     confirm_password = forms.CharField(label="重复密码", widget=forms.PasswordInput())
 
-    mobile_phone = forms.CharField(label="手机号（被覆写）",
-                            validators=[RegexValidator(r'^(1|3|4|5|6|7|8|9)d{9}$',
-                                                       "手机号格式错误")]
-                            )
+    mobile_phone = forms.CharField(label="手机号（被覆写）", validators=[RegexValidator(r'^(1[3|4|5|6|7|8|9])\d{9}$', "手机号格式错误"),])
 
     code = forms.CharField(
         label='验证码',
