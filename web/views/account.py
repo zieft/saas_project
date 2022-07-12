@@ -29,6 +29,6 @@ def send_sms(request):
 
     return JsonResponse({'status': False, 'error': form.errors})
 
-def send_sms_fake():
+def send_sms_fake(request):
 
     return JsonResponse({'status': True})
