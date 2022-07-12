@@ -87,7 +87,8 @@
                     success: function (res){
                         // 如果ajax请求发送成功，并且获得后端返回来的res，则自动执行本函数
                         if(res.status){
-                            console.log("发送成功，进入倒计时")
+                            // console.log("发送成功，进入倒计时")
+                            sendSmsRemind();
 
                         }else{
                             // 错误信息
@@ -102,6 +103,23 @@
                 })
             })
 
+        }
+        /*
+        倒计时
+        */
+        function sendSmsRemind() {
+            var $smsBtn = $('#btnSms'); // 找到按钮，并保存给一个变量smsBtn
+            $smsBtn.prop('disabled', true); // 给按钮添加disabled属性
+            var time = 60;
+            var remind = setInterval(function (){
+                $smsBtn.val(time+'秒后重新发送');
+
+                time = time - 1;
+                if (time<1){
+                    clearInterval(remind);
+                    $smsBtn.val('点击获取验证码').prop('disabled', false);
+                }
+            }, 1000)
         }
     </script>
 
