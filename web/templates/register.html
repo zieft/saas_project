@@ -19,8 +19,8 @@
 {% block content %}
     <div class="account">
         <h1 style="text-align: center">注册</h1>
-        <form id="form", method="post" novalidate>
-        {% csrf_token %}
+        <form id="regForm" method="POST" novalidate>
+            {% csrf_token %}
             {% for field in form %}
                 {% if field.name == 'code' %}
                     <div class="form-group">
@@ -51,7 +51,10 @@
                     </div>
                 {% endif %}
             {% endfor %}
-            <button type="submit" class="btn btn-primary">注 册</button>
+
+            <!--给按钮绑定事件，需要用到按钮的id-->
+            <!--这里我们想用ajax来提交，所以把type换成button，而不用submit-->
+            <button id="btnSubmit" type="button" class="btn btn-primary">注 册</button>
         </form>
     </div>
 
@@ -61,14 +64,36 @@
 {% block js %}
     <script>
         // 页面框架加载完成后自动执行的函数
-        $(function (){
-            bindClickSms()
+        $(function () {
+            bindClickBtnSms();
+            bindClickSubmit();
         });
 
         /*
+        点击提交（注册）
+        */
+        function  bindClickSubmit() {
+            $('#btnSubmit').click(function () {
+                // 收集表单中的数据(找到每一个字段)
+                // 下面这种写法可以一次性直接将表单里的所有键值取到并发到后台
+                // 并且也可以收集csrf token
+                // $('#regForm').serialize()
+                // 数据ajax发送到后台
+                $.ajax({
+                    url:"{% url 'register' %}", // url可以随便写，这里用register是为了省urL
+                    type:"POST", // 要去urls.py中判断收到的是get还是post请求
+                    data:$('#regForm').serialize(),
+                    dataType:"JSON",
+                    success:function (res) {
+                        console.log(res);
+                    }
+                })
+            })
+        }
+        /*
         * 点击获取验证码的按钮绑定事件
         * */
-        function bindClickSms(){
+        function bindClickBtnSms(){
             $('#btnSms').click(function (){
                 $('.error-msg').empty(); // 每次用户点击按钮，先清除错误信息
                 // 获取用户输入的手机号

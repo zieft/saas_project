@@ -4,9 +4,12 @@ from django.http import JsonResponse
 
 
 def register(request):
-    form = RegisterModelForm()
-    return render(request, 'web/templates/register.html', {'form': form})
+    if request.method == 'GET':
+        form = RegisterModelForm()
+        return render(request, 'web/templates/register.html', {'form': form})
 
+    print(request.POST)
+    return JsonResponse({})
 
 def send_sms(request):
     # mobile_phone = request.Get.get('mobile_phone')
