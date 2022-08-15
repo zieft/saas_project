@@ -8,7 +8,14 @@ def register(request):
         form = RegisterModelForm()
         return render(request, 'web/templates/register.html', {'form': form})
 
-    print(request.POST)
+    # 对表单进行校验
+    # 验证的规则定义在class RegisterModelForm()里
+    form = RegisterModelForm(data=request.POST)
+    if form.is_valid():
+        print(form.cleaned_data)
+    else:
+        print(form.errors)
+    # print(request.POST)
     return JsonResponse({})
 
 def send_sms(request):

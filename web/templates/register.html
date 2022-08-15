@@ -79,6 +79,7 @@
                 // 并且也可以收集csrf token
                 // $('#regForm').serialize()
                 // 数据ajax发送到后台
+                // 一般从服务器端获取数据使用GET请求，而向服务器端发送数据用POST请求
                 $.ajax({
                     url:"{% url 'register' %}", // url可以随便写，这里用register是为了省urL
                     type:"POST", // 要去urls.py中判断收到的是get还是post请求
