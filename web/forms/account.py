@@ -74,8 +74,10 @@ class RegisterModelForm(forms.ModelForm):
         exists = models.UserInfo.objects.filter(username=username).exists()
 
         if exists:
-            raise ValidationError('用户名已存在')
-        return username
+            # raise ValidationError('用户名已存在')
+            self.add_error('username', '用户名已存在') # 用这种方法，即使校验失败，也继续运行下面的return
+            # 这样cleaned_data里依然可以取到这个值
+        return username # 这里的return， 就是把username添加到cleaned_data里面去
 
     def clean_password(self):
         pwd = self.cleaned_data['password']
@@ -87,7 +89,7 @@ class RegisterModelForm(forms.ModelForm):
         # 注意！！！！！！
         # self.cleaned_data里储存的是已经校验了的数据
         # 因此这里只能从cleaned_data里取到'username', 'email', 'password', 'confirm_password'
-        pwd = self.cleaned_data['password']
+        pwd = self.cleaned_data.get('password')
         # pwd在前面已经加密过了
         # 因为使用的是encrypt.md5使用的是同一个盐，因此返回的值跟password里的密文是一样的
         cfm_pwd = encrypt.md5(self.cleaned_data['confirm_password'])
@@ -105,8 +107,11 @@ class RegisterModelForm(forms.ModelForm):
 
     # def clean_code(self):
     #     code = self.cleaned_data['code']
-    #     mobile_phone = self.cleaned_data['mobile_phone']
-    #
+    #     # mobile_phone = self.cleaned_data['mobile_phone']
+    #     # 上面一行的写法会造成一个bug，详见Day4 1.4节
+    #     mobile_phone = self.cleaned_data.get('mobile_phone')
+    #     if not mobile_phone:
+    #         return code
     #     conn = get_redis_connection()
     #     redis_code = conn.get(mobile_phone)
     #     if not redis_code:
