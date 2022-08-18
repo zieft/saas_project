@@ -1,5 +1,5 @@
 from django.shortcuts import render, HttpResponse
-from web.forms.account import RegisterModelForm, SendSmsForm
+from web.forms.account import RegisterModelForm, SendSmsForm, LoginSMSForm
 from django.http import JsonResponse
 from web import models
 
@@ -26,6 +26,11 @@ def register(request):
         return JsonResponse({'status': True, 'data': '/login/'})
     # 如果没有通过验证，则返回验证没通过的错误信息
     return JsonResponse({'status': False, 'error': form.errors})
+
+def login_sms(request):
+    """  短信登陆  """
+    form = LoginSMSForm()
+    return render(request, 'login_sms.html', {"form": form})
 
 def send_sms(request):
     # mobile_phone = request.Get.get('mobile_phone')

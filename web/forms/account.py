@@ -12,7 +12,17 @@ from utils.AWS.sms import send_sms_single
 from django_redis import get_redis_connection
 from utils import encrypt
 
-class RegisterModelForm(forms.ModelForm):
+
+class BootstrapForm(object):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for name, field in self.fields.items():
+            field.widget.attrs['class'] = 'form-control'
+            field.widget.attrs['placeholder'] = '请输入%s' % {field.label, }
+
+
+# class RegisterModelForm(forms.ModelForm, BootstrapForm):
+class RegisterModelForm(BootstrapForm, forms.ModelForm): # 在继承BootstrapForm类时，要将参数放在左边，优先级的问题
     # model里的verbose_name可以被覆写
 
     # 下面定义的字段，谁定义在前，谁优先被校验
@@ -22,8 +32,8 @@ class RegisterModelForm(forms.ModelForm):
                                    (attrs={
                                    # 'class': 'form-control',
                                    'placeholder': '提示文字'
-                                            }
-                                    ),
+                               }
+                               ),
                                min_length=8,
                                max_length=64,
                                error_messages={
@@ -41,7 +51,7 @@ class RegisterModelForm(forms.ModelForm):
                                        error_messages={
                                            'min_length': '重复密码长度不能少于8个字符',
                                            'max_length': '重复密码长度不能大于64个字符',
-                                                        },
+                                       },
                                        )
 
     mobile_phone = forms.CharField(label="手机号",
@@ -58,13 +68,14 @@ class RegisterModelForm(forms.ModelForm):
         fields = ['username', 'email', 'password', 'confirm_password',
                   'mobile_phone', 'code']  # 自定义显示字段的顺序
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        for name, field in self.fields.items():
-            # 对model和ModelForm定义的所有字段进行遍历
-            # name是变量名，field就是name变量里保存的对象，比如CharField对象
-            field.widget.attrs['class'] = 'form-control'
-            field.widget.attrs["placeholder"] = '请输入%s' % (field.label)
+    # 下面的代码块comment掉因为可以直接从BootstrapForm类中完整继承下来
+    # def __init__(self, *args, **kwargs):
+    #     super().__init__(*args, **kwargs)
+    #     for name, field in self.fields.items():
+    #         # 对model和ModelForm定义的所有字段进行遍历
+    #         # name是变量名，field就是name变量里保存的对象，比如CharField对象
+    #         field.widget.attrs['class'] = 'form-control'
+    #         field.widget.attrs["placeholder"] = '请输入%s' % (field.label)
 
     # 为“用户名不得重复”而定义的钩子方法
     def clean_username(self):
@@ -75,9 +86,9 @@ class RegisterModelForm(forms.ModelForm):
 
         if exists:
             # raise ValidationError('用户名已存在')
-            self.add_error('username', '用户名已存在') # 用这种方法，即使校验失败，也继续运行下面的return
+            self.add_error('username', '用户名已存在')  # 用这种方法，即使校验失败，也继续运行下面的return
             # 这样cleaned_data里依然可以取到这个值
-        return username # 这里的return， 就是把username添加到cleaned_data里面去
+        return username  # 这里的return， 就是把username添加到cleaned_data里面去
 
     def clean_password(self):
         pwd = self.cleaned_data['password']
@@ -124,6 +135,7 @@ class RegisterModelForm(forms.ModelForm):
     #
     #     return code
 
+
 class SendSmsForm(forms.Form):
     def __init__(self, request, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -167,3 +179,24 @@ class SendSmsForm(forms.Form):
         conn.set(mobile_phone, code, ex=300)
 
         return mobile_phone
+
+
+class LoginSMSForm(BootstrapForm, forms.Form): # bootstrapForm要放在forms.Form的左边，提高优先级
+    """在views中实例化以后传给前端"""
+    mobile_phone = forms.CharField(label='手机号',
+                                   validators=[RegexValidator(settings.MOBILE_PHONE_VALIDATOR, "手机号格式错误"), ],
+                                   )
+
+    code = forms.CharField(
+        label='验证码',
+        widget=forms.TextInput(),
+    )
+
+    # 重写init方法，给所有字段加上bootstrap样式
+    # 下面的代码块comment掉因为可以直接从BootstrapForm类中完整继承下来
+    # def __init__(self, *args, **kwargs):
+    #     super().__init__(*args, **kwargs)
+    #
+    #     for name, field in self.fields.items():
+    #         field.widget.attrs['class'] = 'form-control'
+    #         field.widget.attrs['placeholder'] = '请输入%s' % {field.label, }
