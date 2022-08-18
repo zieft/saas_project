@@ -10,7 +10,7 @@ from django.conf import settings
 # from utils.tencent.sms import send_sms_single
 from utils.AWS.sms import send_sms_single
 from django_redis import get_redis_connection
-
+from utils import encrypt
 
 class RegisterModelForm(forms.ModelForm):
     # model里的verbose_name可以被覆写
@@ -77,13 +77,20 @@ class RegisterModelForm(forms.ModelForm):
             raise ValidationError('用户名已存在')
         return username
 
+    def clean_password(self):
+        pwd = self.cleaned_data['password']
+
+        return encrypt.md5(pwd)
+
     # 判断两次输入的密码是否相同
     def clean_confirm_password(self):
         # 注意！！！！！！
         # self.cleaned_data里储存的是已经校验了的数据
         # 因此这里只能从cleaned_data里取到'username', 'email', 'password', 'confirm_password'
         pwd = self.cleaned_data['password']
-        cfm_pwd = self.cleaned_data['confirm_password']
+        # pwd在前面已经加密过了
+        # 因为使用的是encrypt.md5使用的是同一个盐，因此返回的值跟password里的密文是一样的
+        cfm_pwd = encrypt.md5(self.cleaned_data['confirm_password'])
         if pwd != cfm_pwd:
             raise ValidationError('两次密码不一致')
         return cfm_pwd

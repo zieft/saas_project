@@ -74,6 +74,8 @@
         */
         function  bindClickSubmit() {
             $('#btnSubmit').click(function () {
+                // 每次点击按钮的时候先清空所有的错误信息
+                $('.error-msg').empty();
                 // 收集表单中的数据(找到每一个字段)
                 // 下面这种写法可以一次性直接将表单里的所有键值取到并发到后台
                 // 并且也可以收集csrf token
@@ -87,6 +89,14 @@
                     dataType:"JSON",
                     success:function (res) {
                         console.log(res);
+                        if(res.status){
+                            location.href = res.data; // 这里的res.data是通过后端JsonResponse传递过来的
+                        }else{
+                            // 将错误信息展示在输入框下方
+                            $.each(res.error, function (key, value) {
+                                $("#id_" + key).next().text(value[0]);
+                            })
+                        }
                     }
                 })
             })

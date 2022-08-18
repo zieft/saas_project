@@ -1,7 +1,7 @@
 from django.shortcuts import render, HttpResponse
 from web.forms.account import RegisterModelForm, SendSmsForm
 from django.http import JsonResponse
-
+from web import models
 
 def register(request):
     if request.method == 'GET':
@@ -12,11 +12,20 @@ def register(request):
     # 验证的规则定义在class RegisterModelForm()里
     form = RegisterModelForm(data=request.POST)
     if form.is_valid():
-        print(form.cleaned_data)
-    else:
-        print(form.errors)
-    # print(request.POST)
-    return JsonResponse({})
+        # print(form.cleaned_data)
+        # 验证通过，写入数据库
+        form.save() # 因为我们使用的时ModelForm，所以可以直接使用.save()方法。
+        # 事实上.save()方法等价于下面这几行，且可以自动pop掉数据表中没有的字段
+        # data = form.cleaned_data
+        # data.pop('code')
+        # data.pop('confirm_password')
+        # instance = models.UserInfo.objects.create(**data)
+        # 用这种方式保存的密码在数据库中是明文的，所以还要对密码再进行一次加密
+        # 这个可以写在视图函数的钩子方法里，因为密码经过校验以后，会再返回一个校验后的密码，我们可以在返回的时候加密
+        # 返回给前端：'status': True表示验证成功，然后让前端判断如果验证成功，则跳转到/login/页面
+        return JsonResponse({'status': True, 'data': '/login/'})
+    # 如果没有通过验证，则返回验证没通过的错误信息
+    return JsonResponse({'status': False, 'error': form.errors})
 
 def send_sms(request):
     # mobile_phone = request.Get.get('mobile_phone')
