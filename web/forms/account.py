@@ -103,21 +103,21 @@ class RegisterModelForm(forms.ModelForm):
             raise ValidationError('手机号已注册')
         return mobile_phone
 
-    def clean_code(self):
-        code = self.cleaned_data['code']
-        mobile_phone = self.cleaned_data['mobile_phone']
-
-        conn = get_redis_connection()
-        redis_code = conn.get(mobile_phone)
-        if not redis_code:
-            raise ValidationError('验证码失效或未发送，请重新发送')
-
-        redis_str_code = redis_code.decode('utf-8')
-
-        if redis_code.strip() != redis_str_code: # .strip()用于将用户误输入的空格去掉
-           raise ValidationError('验证码错误，请重新输入')
-
-        return code
+    # def clean_code(self):
+    #     code = self.cleaned_data['code']
+    #     mobile_phone = self.cleaned_data['mobile_phone']
+    #
+    #     conn = get_redis_connection()
+    #     redis_code = conn.get(mobile_phone)
+    #     if not redis_code:
+    #         raise ValidationError('验证码失效或未发送，请重新发送')
+    #
+    #     redis_str_code = redis_code.decode('utf-8')
+    #
+    #     if redis_code.strip() != redis_str_code: # .strip()用于将用户误输入的空格去掉
+    #        raise ValidationError('验证码错误，请重新输入')
+    #
+    #     return code
 
 class SendSmsForm(forms.Form):
     def __init__(self, request, *args, **kwargs):
