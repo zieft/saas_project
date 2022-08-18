@@ -11,14 +11,15 @@ from django.conf import settings
 from utils.AWS.sms import send_sms_single
 from django_redis import get_redis_connection
 from utils import encrypt
+from web.forms.bootstrap import BootstrapForm
 
-
-class BootstrapForm(object):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        for name, field in self.fields.items():
-            field.widget.attrs['class'] = 'form-control'
-            field.widget.attrs['placeholder'] = '请输入%s' % {field.label, }
+# BootstrapForm类移到专门的文件中：web/forms/bootstrap.py
+# class BootstrapForm(object):
+#     def __init__(self, *args, **kwargs):
+#         super().__init__(*args, **kwargs)
+#         for name, field in self.fields.items():
+#             field.widget.attrs['class'] = 'form-control'
+#             field.widget.attrs['placeholder'] = '请输入%s' % {field.label, }
 
 
 # class RegisterModelForm(forms.ModelForm, BootstrapForm):
