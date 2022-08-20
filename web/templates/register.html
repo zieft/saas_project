@@ -131,8 +131,8 @@
                             console.log(res); // {status:False, error:{mobile_phone:["错误信息"]}}
                             // $.each是jquery提供的for循环方法,
                             // 遍历所有res.error，每循环一次执行一次function
-                            $.each(res.error,function (key,value){
-                                $('#id_' + key).next().text(value) // 找id_mobile_phone标签下面的span标签，并显示错误信息
+                            $.each(res.error, function (key, value) {
+                                $("#id_" + key).next().text(value[0]); // 找id_mobile_phone标签下面的span标签，并显示错误信息
                             })
                         }
                     }

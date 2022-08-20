@@ -50,3 +50,62 @@
 
 
 {% endblock %}
+
+{% block js %}
+    <script>
+    $(function () {
+        bindClickBtnSms()
+    });
+
+    function bindClickBtnSms(){
+            $('#btnSms').click(function (){
+                $('.error-msg').empty(); // 每次用户点击按钮，先清除错误信息
+                var mobilePhone = ($('#id_mobile_phone').val());
+
+                // 发送ajax请求
+                $.ajax({
+                    url: "{% url 'send_sms' %}",
+                    type: "GET",
+                    data: { mobile_phone: mobilePhone, tpl: "login"},
+                    dataType: "JSON", // 将服务端返回的数据序列字符串 变成 JSON格式
+                    success: function (res){
+                        // 如果ajax请求发送成功，并且获得后端返回来的res，则自动执行本函数
+                        if(res.status){
+                            // console.log("发送成功，进入倒计时")
+                            sendSmsRemind();
+
+                        }else{
+                            // 错误信息
+                            console.log(res); // {status:False, error:{mobile_phone:["错误信息"]}}
+                            // $.each是jquery提供的for循环方法,
+                            // 遍历所有res.error，每循环一次执行一次function
+                            $.each(res.error,function (key,value){
+                                $('#id_' + key).next().text(value) // 找id_mobile_phone标签下面的span标签，并显示错误信息
+                            })
+                        }
+                    }
+                })
+            })
+
+        }
+    /*
+        倒计时
+*/
+    function sendSmsRemind() {
+            var $smsBtn = $('#btnSms'); // 找到按钮，并保存给一个变量smsBtn
+            $smsBtn.prop('disabled', true); // 给按钮添加disabled属性
+            var time = 60;
+            var remind = setInterval(function (){
+                $smsBtn.val(time+'秒后重新发送');
+
+                time = time - 1;
+                if (time<1){
+                    clearInterval(remind);
+                    $smsBtn.val('点击获取验证码').prop('disabled', false);
+                }
+            }, 1000)
+        }
+
+    </script>
+
+{% endblock %}

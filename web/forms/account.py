@@ -164,11 +164,16 @@ class SendSmsForm(forms.Form):
 
         # 校验数据库中是否已有手机号
         # mobile_phone=mobile_phone 第一个是model.py里的，第二个就是上面刚定义的
-        # exist = models.UserInfo.objects.filter(mobile_phone=mobile_phone).exists()
-        # if exist:
-        #     raise ValueError("手机号已存在")
+        # 由于用户登陆手机号必须存在在数据库里，而注册手机好必须不存在
+        # 因此还需要进行一次判断，判断请求是登陆还是注册
+        exist = models.UserInfo.objects.filter(mobile_phone=mobile_phone).exists()
+        if tpl == 'login':
+            if not exist:
+                raise ValidationError("手机号不存在")
+        else:
+            if exist:
+                raise ValidationError("手机号已存在")
 
-        #
         code = random.randrange(1000, 9999)
         # 发短信
         # sms = send_sms_single(mobile_phone, template_id, [code, ])
@@ -202,18 +207,21 @@ class SendSmsFormFake(forms.Form):
 
         # 判断模板是否有问题
         tpl = self.request.GET.get("tpl")
-        template_id = settings.TENCENT_SMS_TEMPLATE.get(tpl)
-        # template_id = 548760
-        if not template_id:
-            raise ValidationError("模板不存在")
+        # template_id = settings.TENCENT_SMS_TEMPLATE.get(tpl)
+        # # template_id = 548760
+        # if not template_id:
+        #     raise ValidationError("模板不存在")
 
         # 校验数据库中是否已有手机号
         # mobile_phone=mobile_phone 第一个是model.py里的，第二个就是上面刚定义的
         exist = models.UserInfo.objects.filter(mobile_phone=mobile_phone).exists()
-        if exist:
-            raise ValueError("手机号已存在")
+        if tpl == 'login':
+            if not exist:
+                raise ValidationError("手机号不存在")
+        else:
+            if exist:
+                raise ValidationError("手机号已存在")
 
-        #
         code = random.randrange(1000, 9999)
         # 不发短信
         # sms = send_sms_single(mobile_phone, template_id, [code, ])
