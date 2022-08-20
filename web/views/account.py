@@ -1,7 +1,9 @@
+import django_redis
 from django.shortcuts import render, HttpResponse
-from web.forms.account import RegisterModelForm, SendSmsForm, LoginSMSForm
+from web.forms.account import RegisterModelForm, SendSmsForm, LoginSMSForm, SendSmsFormFake
 from django.http import JsonResponse
 from web import models
+
 
 def register(request):
     if request.method == 'GET':
@@ -14,7 +16,7 @@ def register(request):
     if form.is_valid():
         # print(form.cleaned_data)
         # 验证通过，写入数据库
-        form.save() # 因为我们使用的时ModelForm，所以可以直接使用.save()方法。
+        form.save()  # 因为我们使用的时ModelForm，所以可以直接使用.save()方法。
         # 事实上.save()方法等价于下面这几行，且可以自动pop掉数据表中没有的字段
         # data = form.cleaned_data
         # data.pop('code')
@@ -27,10 +29,12 @@ def register(request):
     # 如果没有通过验证，则返回验证没通过的错误信息
     return JsonResponse({'status': False, 'error': form.errors})
 
+
 def login_sms(request):
     """  短信登陆  """
     form = LoginSMSForm()
     return render(request, 'login_sms.html', {"form": form})
+
 
 def send_sms(request):
     # mobile_phone = request.Get.get('mobile_phone')
@@ -53,6 +57,10 @@ def send_sms(request):
 
     return JsonResponse({'status': False, 'error': form.errors})
 
-def send_sms_fake(request):
 
-    return JsonResponse({'status': True})
+def send_sms_fake(request):
+    form = SendSmsFormFake(request, data=request.GET)
+    if form.is_valid():
+        return JsonResponse({'status': True})
+
+    return JsonResponse({'status': False, 'error': form.errors})

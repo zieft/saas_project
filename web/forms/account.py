@@ -13,6 +13,7 @@ from django_redis import get_redis_connection
 from utils import encrypt
 from web.forms.bootstrap import BootstrapForm
 
+
 # BootstrapForm类移到专门的文件中：web/forms/bootstrap.py
 # class BootstrapForm(object):
 #     def __init__(self, *args, **kwargs):
@@ -23,7 +24,7 @@ from web.forms.bootstrap import BootstrapForm
 
 
 # class RegisterModelForm(forms.ModelForm, BootstrapForm):
-class RegisterModelForm(BootstrapForm, forms.ModelForm): # 在继承BootstrapForm类时，要将参数放在左边，优先级的问题
+class RegisterModelForm(BootstrapForm, forms.ModelForm):  # 在继承BootstrapForm类时，要将参数放在左边，优先级的问题
     # model里的verbose_name可以被覆写
 
     # 下面定义的字段，谁定义在前，谁优先被校验
@@ -117,24 +118,25 @@ class RegisterModelForm(BootstrapForm, forms.ModelForm): # 在继承BootstrapFor
             raise ValidationError('手机号已注册')
         return mobile_phone
 
-    # def clean_code(self):
-    #     code = self.cleaned_data['code']
-    #     # mobile_phone = self.cleaned_data['mobile_phone']
-    #     # 上面一行的写法会造成一个bug，详见Day4 1.4节
-    #     mobile_phone = self.cleaned_data.get('mobile_phone')
-    #     if not mobile_phone:
-    #         return code
-    #     conn = get_redis_connection()
-    #     redis_code = conn.get(mobile_phone)
-    #     if not redis_code:
-    #         raise ValidationError('验证码失效或未发送，请重新发送')
-    #
-    #     redis_str_code = redis_code.decode('utf-8')
-    #
-    #     if redis_code.strip() != redis_str_code: # .strip()用于将用户误输入的空格去掉
-    #        raise ValidationError('验证码错误，请重新输入')
-    #
-    #     return code
+    # 验证码可以从网站后端读取，故开启校验
+    def clean_code(self):
+        code = self.cleaned_data['code']
+        # mobile_phone = self.cleaned_data['mobile_phone']
+        # 上面一行的写法会造成一个bug，详见Day4 1.4节
+        mobile_phone = self.cleaned_data.get('mobile_phone')
+        if not mobile_phone:
+            return code
+        conn = get_redis_connection()
+        redis_code = conn.get(mobile_phone)
+        if not redis_code:
+            raise ValidationError('验证码失效或未发送，请重新发送')
+
+        redis_str_code = redis_code.decode('utf-8')
+
+        if redis_str_code.strip() != code:  # .strip()用于将用户误输入的空格去掉
+            raise ValidationError('验证码错误，请重新输入')
+
+        return code
 
 
 class SendSmsForm(forms.Form):
@@ -162,7 +164,7 @@ class SendSmsForm(forms.Form):
 
         # 校验数据库中是否已有手机号
         # mobile_phone=mobile_phone 第一个是model.py里的，第二个就是上面刚定义的
-        # exist = models.UserInfo.objects.filter(mobile_phone=mobile_phone).exist()
+        # exist = models.UserInfo.objects.filter(mobile_phone=mobile_phone).exists()
         # if exist:
         #     raise ValueError("手机号已存在")
 
@@ -182,7 +184,52 @@ class SendSmsForm(forms.Form):
         return mobile_phone
 
 
-class LoginSMSForm(BootstrapForm, forms.Form): # bootstrapForm要放在forms.Form的左边，提高优先级
+class SendSmsFormFake(forms.Form):
+    def __init__(self, request, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.request = request  # 这样一来，我们就可以在钩子函数中使用self.request.GET.get()方法了
+
+    # 为什么不用ModelForm? 因为sendsms里面处理的数据 mobilePhone 和 tpl 跟数据库没有关系
+    mobile_phone = forms.CharField(label='手机号',
+                                   validators=[RegexValidator(settings.MOBILE_PHONE_VALIDATOR, "手机号格式错误"), ])
+
+    def clean_mobile_phone(self):
+        """
+        钩子方法，手机号进行校验的钩子
+        :return:
+        """
+        mobile_phone = self.cleaned_data['mobile_phone']
+
+        # 判断模板是否有问题
+        tpl = self.request.GET.get("tpl")
+        template_id = settings.TENCENT_SMS_TEMPLATE.get(tpl)
+        # template_id = 548760
+        if not template_id:
+            raise ValidationError("模板不存在")
+
+        # 校验数据库中是否已有手机号
+        # mobile_phone=mobile_phone 第一个是model.py里的，第二个就是上面刚定义的
+        exist = models.UserInfo.objects.filter(mobile_phone=mobile_phone).exists()
+        if exist:
+            raise ValueError("手机号已存在")
+
+        #
+        code = random.randrange(1000, 9999)
+        # 不发短信
+        # sms = send_sms_single(mobile_phone, template_id, [code, ])
+        # sms = send_sms_single(mobile_phone, tpl, [code, ])  # 从AWS发短信
+        #
+        # if sms['result'] != 0:  # 0代表发送成功
+        #     raise ValidationError('短信发送失败，{}'.format(sms['errmsg']))
+
+        # 写入redis（django-redis）
+        conn = get_redis_connection()
+        conn.set(mobile_phone, code, ex=300)
+        print('验证码为：', code)
+        return mobile_phone
+
+
+class LoginSMSForm(BootstrapForm, forms.Form):  # bootstrapForm要放在forms.Form的左边，提高优先级
     """在views中实例化以后传给前端"""
     mobile_phone = forms.CharField(label='手机号',
                                    validators=[RegexValidator(settings.MOBILE_PHONE_VALIDATOR, "手机号格式错误"), ],
