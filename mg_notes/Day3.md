@@ -52,31 +52,34 @@
 
 - Django-redis，在django中方便地使用redis
 
-  - 安装django-redis: pip install django-redis
+  - django-redis使用版本4.11.0，稳定
+
+  - 安装django-redis: pip install django-redis==4.11.0
 
   - 使用：
 
-    - 去local_settings.py中配置CACHE
-
+    - 去local_settings.py中配置CACHES
+  
       ```python
-      CACHE= {
-        'default': {
-          'BACKEND': 'django_redis.cache.RedisCache',
-          'LOCATION': 'redis://IP:Port',
-          "OPTIONS": {
-            "CLIENT_CLASS": "django_redis.client.DefaultClient",
-            "CONNECTION_POOL_KWARGS":{
-                    "max_connections": 1000,
-            "encoding": 'utf-8'
-            },
-      			"PASSWORD": "foobared"
+      CACHES = {
+          'default': {
+              'BACKEND': "django_redis.cache.RedisCache",
+              'LOCATION': "redis://127.0.0.1:6379",
+              'OPTIONS': {
+                  'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+                  'CONNECTION_POOL_KWARGS': {
+                      'max_connections': 1000,
+                      'encoding': 'utf-8'
+                  },
+                  'PASSWORD': 'foobared'
+              }
           }
-        }
       }
+      
       ```
-
+  
     - view.py里写
-
+  
       ```python
       from django_redis import get_redis_connection
       
@@ -86,18 +89,19 @@
         value = conn.get(key)
         return HttpResponse("OK")
       ```
-
+  
       
-
+  
       
+  
 
-## 今日概要
+## 本日概要
 
 - 注册
 - 短信验证码登录
 - 用户名密码登录
 
-## 今日详细
+## 本日详细
 ### 1 实现注册
 #### 1.1 展示注册页面
 ##### 1.1.1 创建web应用
