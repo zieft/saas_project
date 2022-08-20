@@ -1,0 +1,52 @@
+{% extends 'layout/basic.html' %}
+{% load static %}
+{% block title %}
+    用户短信登陆
+{% endblock %}
+
+{% block css %}
+    <link rel="stylesheet" href="{% static 'css/account.css' %}">
+    <style>
+    .error-msg{
+        color: red;
+        position: absolute;
+        font-size: 13px;
+    }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="account">
+        <h1 style="text-align: center">短信登陆</h1>
+        <form id="smsForm" method="POST" novalidate>
+            {% csrf_token %}
+            {% for field in form %}
+                {% if field.name == 'code' %}
+                    <div class="form-group">
+                        <label for={{ field.id_for_label }}>{{ field.label }}</label>
+                        <div class="clearfix">
+                            <div class="col-md-7" style="padding-left: 0;">
+                                {{ field }}
+                                <span class="error-msg"></span>
+                            </div>
+                            <div class="col-md-5">
+                                <input id="btnSms" type="button" class="btn btn-default" value="点击获取验证码"> <!--id="btnSms"用于下面JavaScript绑定事件-->
+                            </div>
+                        </div>
+
+                    </div>
+                {% else %}
+                    <div class="form-group">
+                        <label for={{ field.id_for_label }}>{{ field.label }}</label>
+                        {{ field }}
+                        <span class="error-msg"></span><!--这个span里面就会显示错误信息-->
+                    </div>
+                {% endif %}
+            {% endfor %}
+
+            <button id="btnSubmit" type="button" class="btn btn-primary">登  陆</button>
+        </form>
+    </div>
+
+
+{% endblock %}
