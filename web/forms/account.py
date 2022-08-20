@@ -248,6 +248,37 @@ class LoginSMSForm(BootstrapForm, forms.Form):  # bootstrapForm要放在forms.Fo
         widget=forms.TextInput(),
     )
 
+    def clean_mobile_phone(self):
+        mobile_phone = self.cleaned_data.get("mobile_phone")
+        # exists = models.UserInfo.objects.filter(mobile_phone=mobile_phone).exists()
+        # 这里可以把已注册的用户手机号 命名为 用户对象 user_object
+        # 这样做有助于将用户对象保存在session当中,而用户对象也可以直接调用其成员变量
+        # 例如 user_object.username, user_object.email等等
+        # .first()是指 获取数据库中这一整行的数据
+        user_object = models.UserInfo.objects.filter(mobile_phone=mobile_phone).first()
+        if not user_object:
+            raise ValidationError("手机号不存在")
+        return user_object
+
+    def clean_code(self):
+        code = self.cleaned_data.get("code")
+        user_object = self.cleaned_data.get("mobile_phone")
+        # 手机号若不存在，则验证码无需再校验
+        if not user_object:
+            return code
+
+        conn = get_redis_connection()
+        redis_code = conn.get(user_object.mobile_phone)
+        if not redis_code:
+            raise ValidationError("验证码失效或者未发送，请重新获取")
+
+        redis_str_code = redis_code.decode("utf-8")
+
+        if code.strip() != redis_str_code:
+            raise ValidationError("验证码错误，请重新输入")
+
+        return code
+
     # 重写init方法，给所有字段加上bootstrap样式
     # 下面的代码块comment掉因为可以直接从BootstrapForm类中完整继承下来
     # def __init__(self, *args, **kwargs):

@@ -32,9 +32,22 @@ def register(request):
 
 def login_sms(request):
     """  短信登陆  """
-    form = LoginSMSForm()
-    return render(request, 'login_sms.html', {"form": form})
+    if request.method == "GET":
+        form = LoginSMSForm()
+        return render(request, 'login_sms.html', {"form": form})
 
+    # 接收到登陆POST请求，对请求内容进行校验
+    form = LoginSMSForm(request.POST)
+    if form.is_valid():
+        # 用户输入信息正确，登陆成功
+        user_object = form.cleaned_data['mobile_phone']
+        # 用户信息放入session
+        request.session['user_id'] = user_object.id
+        request.session['user_name'] = user_object.username
+
+        return JsonResponse({'status': True, 'data': '/index/'})
+
+    return JsonResponse({"status": False, 'error': form.errors})
 
 def send_sms(request):
     # mobile_phone = request.Get.get('mobile_phone')

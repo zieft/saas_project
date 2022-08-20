@@ -54,9 +54,30 @@
 {% block js %}
     <script>
     $(function () {
-        bindClickBtnSms()
+        bindClickBtnSms();
+        bindClickSubmit();
     });
-
+    /* 点击登陆 */
+    function bindClickSubmit() {
+        $('#btnSubmit').click(function () {
+            $('.error-msg').empty();
+            $.ajax({
+                url: "{% url 'login_sms' %}",
+                type: "POST",
+                data: $('#smsForm').serialize(),
+                dataType: 'JSON',
+                success: function (res) {
+                    if (res.status) {
+                        location.href = res.data;
+                    }else {
+                        $.each(res.error, function (key, value) {
+                            $("#id_" + key).next().text(value[0]);
+                        })
+                    }
+                }
+            })
+        })
+    }
     function bindClickBtnSms(){
             $('#btnSms').click(function (){
                 $('.error-msg').empty(); // 每次用户点击按钮，先清除错误信息
