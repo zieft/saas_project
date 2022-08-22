@@ -1,29 +1,29 @@
-from PIL import Image
-
-# 创建图片
-img = Image.new(mode='RGB', size=(120, 30), color=(255, 255, 255))
-
-# with open('code.png', 'wb') as f:
-#     img.save(f, format='png')
-
-# 创建画笔对象
-from PIL import ImageDraw
-
-draw = ImageDraw.Draw(img, mode='RGB')
-
-# 画点
-draw.point([100, 10], fill='red')
-
-# 画线
-draw.line((10, 5, 30, 18), fill="red")
-
-# 写文本
-draw.text([0, 0], "python", "red")
-
-# 改变文本字体,字体文件需自备
-from PIL import ImageFont
-
-font = ImageFont.truetype("28")
+# from PIL import Image
+#
+# # 创建图片
+# img = Image.new(mode='RGB', size=(120, 30), color=(255, 255, 255))
+#
+# # with open('code.png', 'wb') as f:
+# #     img.save(f, format='png')
+#
+# # 创建画笔对象
+# from PIL import ImageDraw
+#
+# draw = ImageDraw.Draw(img, mode='RGB')
+#
+# # 画点
+# draw.point([100, 10], fill='red')
+#
+# # 画线
+# draw.line((10, 5, 30, 18), fill="red")
+#
+# # 写文本
+# draw.text([0, 0], "python", "red")
+#
+# # 改变文本字体,字体文件需自备
+# from PIL import ImageFont
+#
+# font = ImageFont.truetype("28")
 
 import random
 from PIL import Image, ImageFilter, ImageFont, ImageDraw

@@ -287,3 +287,10 @@ class LoginSMSForm(BootstrapForm, forms.Form):  # bootstrapForm要放在forms.Fo
     #     for name, field in self.fields.items():
     #         field.widget.attrs['class'] = 'form-control'
     #         field.widget.attrs['placeholder'] = '请输入%s' % {field.label, }
+
+
+class LoginForm(BootstrapForm, forms.Form):
+
+    username = forms.CharField(label='用户名')
+    password = forms.CharField(label='密  码', widget=forms.PasswordInput)
+    code = forms.CharField(label='图片验证码')

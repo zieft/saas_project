@@ -1,9 +1,10 @@
 import django_redis
 from django.shortcuts import render, HttpResponse
-from web.forms.account import RegisterModelForm, SendSmsForm, LoginSMSForm, SendSmsFormFake
+from web.forms.account import RegisterModelForm, SendSmsForm, LoginSMSForm, \
+    SendSmsFormFake, LoginForm
+
 from django.http import JsonResponse
 from web import models
-
 
 def register(request):
     if request.method == 'GET':
@@ -49,6 +50,7 @@ def login_sms(request):
 
     return JsonResponse({"status": False, 'error': form.errors})
 
+
 def send_sms(request):
     # mobile_phone = request.Get.get('mobile_phone')
     # tpl = request.GET.get('tpl')
@@ -77,3 +79,20 @@ def send_sms_fake(request):
         return JsonResponse({'status': True})
 
     return JsonResponse({'status': False, 'error': form.errors})
+
+
+def login(request):
+    """ 用户名 密码 登陆"""
+    form = LoginForm()
+    return render(request, 'login.html', {'form': form})
+
+
+def image_code(request):
+    from utils.image_code import check_code
+    from io import BytesIO
+    img, code = check_code()
+    # 将图片内容返还给前端，需要将图片内容先写道内存中
+    stream = BytesIO()
+    img.save(stream, 'png')
+
+    return HttpResponse(stream.getvalue())
