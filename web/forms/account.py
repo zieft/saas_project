@@ -291,7 +291,8 @@ class LoginSMSForm(BootstrapForm, forms.Form):  # bootstrapForm要放在forms.Fo
 
 class LoginForm(BootstrapForm, forms.Form):
     username = forms.CharField(label='用户名')
-    password = forms.CharField(label='密  码', widget=forms.PasswordInput)
+    password = forms.CharField(label='密码', widget=forms.PasswordInput(render_value=True))
+    # render_value=True时，刷新页面后，不会清空密码栏（默认每次刷新都会清空密码栏）
     code = forms.CharField(label='图片验证码')
 
     def __init__(self, request, *args, **kwargs):

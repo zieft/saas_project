@@ -7,17 +7,17 @@
 {% block css %}
     <link rel="stylesheet" href="{% static 'css/account.css' %}">
     <style>
-    .error-msg{
-        color: red;
-        position: absolute;
-        font-size: 13px;
-    }
+        .error-msg {
+            color: red;
+            position: absolute;
+            font-size: 13px;
+        }
     </style>
 {% endblock %}
 
 {% block content %}
     <div class="account">
-        <h1 style="text-align: center">用户登陆</h1>
+        <h1 style="text-align: center">用户登录</h1>
         <form id="smsForm" method="POST" novalidate>
             {% csrf_token %}
             {% for field in form %}
@@ -43,8 +43,17 @@
                     </div>
                 {% endif %}
             {% endfor %}
+            <div>
+                <div style="float:right;">
+                    <a href="{% url 'login_sms' %}">短信验证码登录</a>
+                </div>
+            </div>
 
-            <button type="submit" class="btn btn-primary">登  陆</button>
+            <div class="row">
+                <div class="col-xs-3">
+                    <button type="submit" class="btn btn-primary">登 录</button>
+                </div>
+            </div>
         </form>
     </div>
 
@@ -53,11 +62,11 @@
 
 {% block js %}
     <script>
-    $(function () {
-        $('#imageCode').click(function () {
-            var oldSrc = $(this).attr('src'); // 获取原地址
-            $(this).attr('src', oldSrc + '?'); // 在原地址后面加上个?，地址发生变化则会出发再次请求
+        $(function () {
+            $('#imageCode').click(function () {
+                var oldSrc = $(this).attr('src'); // 获取原地址
+                $(this).attr('src', oldSrc + '?'); // 在原地址后面加上个?，地址发生变化则会出发再次请求
+            })
         })
-    })
     </script>
 {% endblock %}
