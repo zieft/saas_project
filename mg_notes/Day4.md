@@ -44,5 +44,30 @@ if not mobile_phone:
     return code
 ```
 
+2. ### 短信登陆
 
+   2.1 展示页面
 
+   2.2 点击发送短信
+
+   2.3 点击登录
+
+3. ### 用户名、密码登陆
+
+   3.1 生成图片验证码
+
+   `pip install pillow`
+
+   ```python
+   from PIL import Image
+   
+   img = Image.new(mode='RGB', size=(120, 30), color=(255, 255, 255))
+   ```
+
+   
+
+   3.2 session & Cookie
+
+   3.3 页面显示
+
+   3.4 登陆
