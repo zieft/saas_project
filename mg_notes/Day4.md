@@ -64,10 +64,23 @@ if not mobile_phone:
    img = Image.new(mode='RGB', size=(120, 30), color=(255, 255, 255))
    ```
 
-   
-
    3.2 session & Cookie
 
+   ```
+   Cookie存在于用户浏览器中，用于存储服务端返回的key
+   Session存储于服务端，用于存储key and Value
+   Cookie可以用key取Session里取Value
+   ```
+   
+   django中的session
+   
+   ![image-20220822101027545](C:\Users\zieft\AppData\Roaming\Typora\typora-user-images\image-20220822101027545.png)
+   
    3.3 页面显示
-
+   
+    	1. 用户访问注册页面
+    	2. 页面给用户返回一个带有img标签的响应，其中包含src指向图片验证码的路由
+    	3. 后端生成图片验证码，并发给前端
+    	4. 同时code保存到session中
+   
    3.4 登陆
