@@ -93,6 +93,7 @@ def image_code(request):
     img, code = check_code()
     # 将生成的验证码写入session 数据库
     request.session['image_code'] = code
+    request.session.set_expiry(600) # 设置600秒失效，默认是两周
     # 将图片内容返还给前端，需要将图片内容先写道内存中
     stream = BytesIO()
     img.save(stream, 'png')
