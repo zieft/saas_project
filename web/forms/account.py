@@ -290,7 +290,29 @@ class LoginSMSForm(BootstrapForm, forms.Form):  # bootstrapForm要放在forms.Fo
 
 
 class LoginForm(BootstrapForm, forms.Form):
-
     username = forms.CharField(label='用户名')
     password = forms.CharField(label='密  码', widget=forms.PasswordInput)
     code = forms.CharField(label='图片验证码')
+
+    def __init__(self, request, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.request = request
+
+    def clean_password(self):
+        pwd = self.cleaned_data['password']
+
+        return encrypt.md5(pwd)
+
+    def clean_code(self):
+        # 读取用户输入
+        code = self.cleaned_data['code']
+
+        # 读取session中存储的
+        code_from_session = self.reqeust.session.get("image_code")
+        if not code_from_session:
+            raise ValidationError("验证码已过期，请重新获取")
+
+        if code.upper().strip() != code_from_session.upper().strip(): # 大小写不敏感
+            raise ValidationError("验证码输入错误")
+
+        return code

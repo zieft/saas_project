@@ -1,5 +1,5 @@
 import django_redis
-from django.shortcuts import render, HttpResponse
+from django.shortcuts import render, HttpResponse, redirect
 from web.forms.account import RegisterModelForm, SendSmsForm, LoginSMSForm, \
     SendSmsFormFake, LoginForm
 
@@ -83,9 +83,22 @@ def send_sms_fake(request):
 
 def login(request):
     """ 用户名 密码 登陆"""
-    form = LoginForm()
-    return render(request, 'login.html', {'form': form})
+    if request.method == 'GET':
+        form = LoginForm(request)
+        return render(request, 'login.html', {'form': form})
+    form = LoginForm(request, data=request.POST)
+    if form.is_valid():
+        username = form.cleaned_data['username']
+        password = form.cleaned_data['password']
 
+        user_object = models.UserInfo.objects.filter(username=username, password=password).first()
+        if user_object:
+            # 用户存在，跳转
+            return redirect('index')
+        form.add_error('username', '用户名或密码错误')
+        return redirect('index')
+
+    return  render(request, 'login.html', {'form': form})
 
 def image_code(request):
     from utils.image_code import check_code
