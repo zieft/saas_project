@@ -91,6 +91,8 @@ def image_code(request):
     from utils.image_code import check_code
     from io import BytesIO
     img, code = check_code()
+    # 将生成的验证码写入session 数据库
+    request.session['image_code'] = code
     # 将图片内容返还给前端，需要将图片内容先写道内存中
     stream = BytesIO()
     img.save(stream, 'png')
