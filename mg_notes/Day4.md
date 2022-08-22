@@ -67,7 +67,7 @@ if not mobile_phone:
    3.2 session & Cookie
 
    ```
-   Cookie存在于用户浏览器中，用于存储服务端返回的key
+   Cookie存在于用户浏览器中，用于存储服务端返回的key (sessionid)
    Session存储于服务端，用于存储key and Value
    Cookie可以用key取Session里取Value
    ```
@@ -76,6 +76,8 @@ if not mobile_phone:
    
    ![image-20220822101027545](C:\Users\zieft\AppData\Roaming\Typora\typora-user-images\image-20220822101027545.png)
    
+   redis和session功能上相似，session可以自动生成用户识别标识(sessionid)，redis不能生成，需要用户自己指定（手机号）。
+   
    3.3 页面显示
    
     	1. 用户访问注册页面
@@ -83,4 +85,32 @@ if not mobile_phone:
     	3. 后端生成图片验证码，并发给前端
     	4. 同时code保存到session中
    
-   3.4 登陆
+   3.4 登录
+   
+   ​	3.4.1 中间件
+   
+   ​	用户登录成功后，想要在header中显示已登录的用户名，并且去除登录、注册按钮，需要用到中间件。中间件初始化方法：
+   
+   ```python
+   from django.utils.deprecation import MiddlewareMixin
+   
+   class AuthMiddleware(MiddlewareMixin):
+   ```
+   
+   ```python
+       def process_request(self, request):
+           """
+           如果用户已登录，则在request中赋值
+           比如：
+           request.tracer = 666
+           则，当用户登录成功以后，在所有的视图中都可以通过request.tracer来获取666这个值
+           """
+           user_id = request.session.get('user_id', 0) # 从session中获取用户名，没有则定义为0
+   
+           user_object = models.UserInfo.objects.filter(id=user_id).first() # 去数据库中找这个user
+           request.tracer = user_object
+   ```
+   
+   定义好的中间件，要在settings.py里注册。
+
+​		用的时候在前端中可以判断，request.tracer中有没有值，有则表示用户已经登陆，header显示用户名，去掉登录注册按钮。没有，则显示登录注册按钮。

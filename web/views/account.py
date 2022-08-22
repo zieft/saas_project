@@ -6,6 +6,7 @@ from web.forms.account import RegisterModelForm, SendSmsForm, LoginSMSForm, \
 from django.http import JsonResponse
 from web import models
 
+
 def register(request):
     if request.method == 'GET':
         form = RegisterModelForm()
@@ -45,6 +46,7 @@ def login_sms(request):
         # 用户信息放入session
         request.session['user_id'] = user_object.id
         request.session['user_name'] = user_object.username
+        request.session.set_expiry(60 * 60 * 24)  # 一天内免登录
 
         return JsonResponse({'status': True, 'data': '/index/'})
 
@@ -93,11 +95,15 @@ def login(request):
 
         user_object = models.UserInfo.objects.filter(username=username, password=password).first()
         if user_object:
-            # 用户存在，跳转
+            # 用户存在，登录成功，跳转
+            request.session['user_id'] = user_object.id
+            # request.session['user_name'] = user_object.username
+            request.session.set_expiry(60 * 60 * 24)  # 一天内免登录
             return redirect('index')
         form.add_error('username', '用户名或密码错误')
 
-    return  render(request, 'login.html', {'form': form})
+    return render(request, 'login.html', {'form': form})
+
 
 def image_code(request):
     from utils.image_code import check_code
@@ -105,9 +111,14 @@ def image_code(request):
     img, code = check_code()
     # 将生成的验证码写入session 数据库
     request.session['image_code'] = code
-    request.session.set_expiry(600) # 设置600秒失效，默认是两周
+    request.session.set_expiry(600)  # 设置600秒失效，默认是两周
     # 将图片内容返还给前端，需要将图片内容先写道内存中
     stream = BytesIO()
     img.save(stream, 'png')
 
     return HttpResponse(stream.getvalue())
+
+
+def logout(request):
+    request.session.flush()  # 清楚session
+    return redirect('login')
