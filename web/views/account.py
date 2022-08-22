@@ -96,7 +96,6 @@ def login(request):
             # 用户存在，跳转
             return redirect('index')
         form.add_error('username', '用户名或密码错误')
-        return redirect('index')
 
     return  render(request, 'login.html', {'form': form})
 

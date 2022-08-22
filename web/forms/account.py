@@ -308,7 +308,7 @@ class LoginForm(BootstrapForm, forms.Form):
         code = self.cleaned_data['code']
 
         # 读取session中存储的
-        code_from_session = self.reqeust.session.get("image_code")
+        code_from_session = self.request.session.get("image_code")
         if not code_from_session:
             raise ValidationError("验证码已过期，请重新获取")
 
