@@ -21,6 +21,8 @@ class UserInfo(models.Model):
 
     # ModelForm里也可以定义这里没有的字段，这种字段将不会被迁移到数据库中
 
+    # price_policy = models.ForeignKey(verbose_name='价格策略', to='PricePolicy', null=True, blank=True)
+
 
 class PricePolicy(models.Model):
     """ 价格策略 """

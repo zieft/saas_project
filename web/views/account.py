@@ -31,7 +31,7 @@ def register(request):
 
         # 创建交易记录：
         # 一下代码块对应Auth.py中的方式一
-        """
+
         models.Transaction.objects.create(
             status=2,
             order=str(uuid.uuid4()), # uuid用于生成随机字符串
@@ -42,7 +42,7 @@ def register(request):
             start_datetime=datetime.datetime.now(),
         )
 
-        """
+
         # 使用Auth.py中的方式2，则不需要在这里创建交易记录
 
 
