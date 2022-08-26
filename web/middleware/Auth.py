@@ -1,3 +1,4 @@
+import datetime
 from django.utils.deprecation import MiddlewareMixin
 from django.shortcuts import redirect
 from django.conf import settings
@@ -31,3 +32,26 @@ class AuthMiddleware(MiddlewareMixin):
         # 检查用户是否已登录，已登录则继续往后走，未登录则跳回登录界面
         if not request.tracer:
             return redirect('login')
+
+        # 登录成功后，访问后台管理时：获取当前用户所拥有的额度
+        # 方式1：免费额度在交易记录中存储
+        # models.Transaction.objects.filter(user=user_object) # 查找当前用户所有交易记录
+        # 获取当前用户id值最大（表示最新)的交易记录
+        _object = models.Transaction.objects.filter(user=user_object,
+                                                    status=2
+                                                    ).order_by('-id').first()
+        # 判断_object是否已过期
+        current_datetime = datetime.datetime.now()
+        if _object.end_datetime and \
+                _object.end_datetime < \
+                current_datetime: # 只有非免费版才有end_datetime
+            # 付费版 and 过期
+            _object = models.Transaction.objects.filter(user=user_object,
+                                                        status=2,
+                                                        price_policy__category=1
+                                                        ).first()
+            # project.py中就可以通过request.transaction.user / price_policy 等等来获取可用额度
+            request.price_policy = _object.price_policy
+
+
+        # 方式2： 免费的额度存储配置文件
