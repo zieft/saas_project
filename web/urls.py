@@ -7,7 +7,7 @@ urlpatterns = [
     url(r'^login/sms/$', account.login_sms, name='login_sms'),
     url(r'^login/$', account.login, name='login'),
     url(r'^logout/$', account.logout, name='logout'),
-    url(r'^iamge/code/$', account.image_code, name='image_code'),
+    url(r'^image/code/$', account.image_code, name='image_code'),
     url(r'^send/sms/$', account.send_sms_fake, name='send_sms'),
     url(r'^index/$', home.index, name='index'),
 
