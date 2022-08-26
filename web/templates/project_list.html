@@ -1,5 +1,9 @@
 {% extends 'layout/manage.html' %}
 
+{% block css %}
+
+{% endblock %}
+
 {% block content %}
     <div class="container-fluid"> <!-- 随浏览器大小平铺 -->
         <!--data-toggle表示点击按钮后要出一个对话框，target就是要显示的对话框的id-->
@@ -15,7 +19,7 @@
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
                             aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title" id="myModalLabel">Modal title</h4>
+                    <h4 class="modal-title" id="myModalLabel">新建项目</h4>
                 </div>
                 <div class="modal-body">
                     <form id="addForm">
@@ -30,10 +34,40 @@
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary">Save changes</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取 消</button>
+                    <button id='btnSubmit' type="button" class="btn btn-primary">确 定</button>
                 </div>
             </div>
         </div>
     </div>
+{% endblock %}
+
+{% block js %}
+    <script>
+        $(function () {
+            bindSubmit();
+        });
+
+        function bindSubmit() {
+            $("#btnSubmit").click(function () {
+
+                $.ajax({
+                    url: "{% url 'project_list' %}", // 用post请求访问这个路由
+                    type: "POST",
+                    data: $('#addForm').serialize(),
+                    dataType: "JSON",
+                    success: function (res) {
+                        console.log(res);
+                        if (res.status) {
+
+                        } else {
+                            $.each(res.error, function (key, value) {
+                                $("#id_" + key).next().text(value[0]);
+                            })
+                        }
+                    }
+                })
+            })
+        }
+    </script>
 {% endblock %}
