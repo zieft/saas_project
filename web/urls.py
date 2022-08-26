@@ -1,6 +1,6 @@
 # 路由划分
 from django.conf.urls import url
-from web.views import account, home
+from web.views import account, home, project
 
 urlpatterns = [
     url(r'^register/$', account.register, name='register'),  # name可以方便反向解析
@@ -10,5 +10,8 @@ urlpatterns = [
     url(r'^iamge/code/$', account.image_code, name='image_code'),
     url(r'^send/sms/$', account.send_sms_fake, name='send_sms'),
     url(r'^index/$', home.index, name='index'),
+
+
+    url(r'^project/list/$', project.project_list, name='project_list'),
 
 ]
