@@ -59,7 +59,7 @@
                     success: function (res) {
                         console.log(res);
                         if (res.status) {
-
+                            location.href = location.href; // 等于 location.reload() 页面刷新
                         } else {
                             $.each(res.error, function (key, value) {
                                 $("#id_" + key).next().text(value[0]);

@@ -12,6 +12,11 @@ def project_list(request):
     # post请求由添加项目的表单通过ajax提交过来
     form = ProjectModelForm(data=request.POST)
     if form.is_valid():
-        pass
+        # 验证通过: 项目名、颜色、描述 + 创建者（当前登录的用户）
+        form.instance.creator = request.tracer.user  # 直接在form实例里添加creator
+
+        # 创建项目
+        form.save()
+        return JsonResponse({'status': True})
 
     return JsonResponse({'status': False, 'error': form.errors})
