@@ -27,7 +27,7 @@ def register(request):
         # form.save() 返回的用户对象 等同于 models.UserInfo.objects.fitler()取当前这条数据
 
         # 从数据库种获取相应的价格策略对象
-        price_policy_instance = models.PricePolicy.objects.filter('category=1', title='个人免费版').first()
+        price_policy_instance = models.PricePolicy.objects.filter(category=1, title='个人免费版').first()
 
         # 创建交易记录：
         # 一下代码块对应Auth.py中的方式一
