@@ -146,8 +146,6 @@ WHITE_REGEX_URL_LIST = [
     '/index/',
 ]
 
-
-
 try:
     from .local_settings import *
 except ImportError:
