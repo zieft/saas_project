@@ -1,4 +1,5 @@
 from django import forms
+from django.core.exceptions import ValidationError
 from web.forms.bootstrap import BootstrapForm
 from web import models
 
@@ -13,3 +14,27 @@ class ProjectModelForm(BootstrapForm, forms.ModelForm):
         widgets = {
             'desc': forms.Textarea(attrs={'xx': 123}),  # attrs按需添加
         }
+
+    def __init__(self, request, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.request = request
+
+    def clean_name(self):
+        """ 项目校验 """
+        # 1. 当前用户是否已经创建过此项目
+        name = self.cleaned_data['name']
+        exists = models.Project.objects.filter(name=name, creator=self.request.tracer.user).exists()
+
+        if exists:
+            raise ValidationError("您已经创建过该项目")
+
+        # 2. 当前用户是否还有额度创建此项目
+        max_count = self.request.tracer.price_policy.project_num
+
+        # 当前用户已经创建过count个项目
+        count = models.Project.objects.filter(creator=self.request.tracer.user).count()
+
+        if count >= max_count:
+            raise ValidationError("项目数量超过限制，请购买vip获得更多项目额度")
+
+        return name

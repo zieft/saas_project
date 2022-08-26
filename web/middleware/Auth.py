@@ -4,6 +4,7 @@ from django.shortcuts import redirect
 from django.conf import settings
 from web import models
 
+
 class Tracer(object):
     def __init__(self):
         self.user = None
@@ -52,15 +53,15 @@ class AuthMiddleware(MiddlewareMixin):
         current_datetime = datetime.datetime.now()
         if _object.end_datetime and \
                 _object.end_datetime < \
-                current_datetime: # 只有非免费版才有end_datetime
+                current_datetime:  # 只有非免费版才有end_datetime
             # 付费版 and 过期
             _object = models.Transaction.objects.filter(user=user_object,
                                                         status=2,
                                                         price_policy__category=1
                                                         ).first()
             # project.py中就可以通过request.transaction.user / price_policy 等等来获取可用额度
-            request.price_policy = _object.price_policy
-
+            request.tracer.price_policy = _object.price_policy
+        request.tracer.price_policy = _object.price_policy
 
         # 方式2： 免费的额度存储配置文件
         # if not _object:
