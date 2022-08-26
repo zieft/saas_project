@@ -30,6 +30,8 @@ def register(request):
         price_policy_instance = models.PricePolicy.objects.filter('category=1', title='个人免费版').first()
 
         # 创建交易记录：
+        # 一下代码块对应Auth.py中的方式一
+        """
         models.Transaction.objects.create(
             status=2,
             order=str(uuid.uuid4()), # uuid用于生成随机字符串
@@ -38,8 +40,12 @@ def register(request):
             count=0,
             price=0,
             start_datetime=datetime.datetime.now(),
-
         )
+
+        """
+        # 使用Auth.py中的方式2，则不需要在这里创建交易记录
+
+
 
         # 事实上.save()方法等价于下面这几行，且可以自动pop掉数据表中没有的字段
         # data = form.cleaned_data

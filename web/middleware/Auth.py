@@ -27,7 +27,7 @@ class AuthMiddleware(MiddlewareMixin):
         url = request.path_info
         # 检擦是否在白名单里，在则返回，不在则继续判断用户是否登录
         if url in white_list:
-            return # 中间件返回None时，说明什么都不做，继续往后走
+            return  # 中间件返回None时，说明什么都不做，继续往后走
 
         # 检查用户是否已登录，已登录则继续往后走，未登录则跳回登录界面
         if not request.tracer:
@@ -41,6 +41,7 @@ class AuthMiddleware(MiddlewareMixin):
                                                     status=2
                                                     ).order_by('-id').first()
         # 判断_object是否已过期
+        """
         current_datetime = datetime.datetime.now()
         if _object.end_datetime and \
                 _object.end_datetime < \
@@ -52,6 +53,16 @@ class AuthMiddleware(MiddlewareMixin):
                                                         ).first()
             # project.py中就可以通过request.transaction.user / price_policy 等等来获取可用额度
             request.price_policy = _object.price_policy
-
+        """
 
         # 方式2： 免费的额度存储配置文件
+        if not _object:
+            # 没有购买
+            request.price_policy = models.PricePolicy.objects.filter(category=1, title="个人免费版").first()
+        else:
+            # 付费版
+            current_datetime = datetime.datetime.now()
+            if _object.end_datetime < current_datetime:
+                request.price_policy = models.PricePolicy.objects.filter(category=1, title="个人免费版").first()
+            else:
+                request.price_policy = _object.price_policy
