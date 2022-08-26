@@ -2,12 +2,43 @@ from django.shortcuts import render
 from web.forms.project import ProjectModelForm
 from django.http import JsonResponse
 
+from web.forms.project import ProjectModelForm
+from web import models
+
 
 def project_list(request):
     """ 项目列表 """
     if request.method == 'GET':  # 有网址直接访问，展示项目
+        """
+        1. 从数据库中获取两个部分数据
+            我创建的所有项目：已星标、未星标
+            我参与的所有项目：已星标、未星标
+        2. 循环两个列表，提取所有已星标的项目
+        
+        得到三个列表：星标、创建、参与
+        """
+        project_dict = {'star': [], 'my': [], 'join': []}
+
+        my_project_list = models.Project.objects.filter(  # 保存的是Project对象
+            creator=request.tracer.user
+        )
+        for project in my_project_list:
+            if project.star:
+                project_dict['star'].append(project)
+            else:
+                project_dict['my'].append(project)
+
+        join_project_list = models.ProjectUser.objects.filter(  # 保存的是ProjectUser对象
+            user=request.tracer.user
+        )
+        for project_user in join_project_list:
+            if project_user.star:
+                project_dict['star'].append(project_user.project)
+            else:
+                project_dict['join'].append(project_user.project)
+
         form = ProjectModelForm(request)
-        return render(request, 'project_list.html', {'form': form})
+        return render(request, 'project_list.html', {'form': form, 'project_dict': project_dict})
 
     # post请求由添加项目的表单通过ajax提交过来
     form = ProjectModelForm(request, data=request.POST)
