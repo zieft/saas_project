@@ -1,3 +1,6 @@
+import uuid
+import datetime
+
 import django_redis
 from django.shortcuts import render, HttpResponse, redirect
 from web.forms.account import RegisterModelForm, SendSmsForm, LoginSMSForm, \
@@ -18,7 +21,26 @@ def register(request):
     if form.is_valid():
         # print(form.cleaned_data)
         # 验证通过，写入数据库
-        form.save()  # 因为我们使用的时ModelForm，所以可以直接使用.save()方法。
+
+        # 用户表种新建了一条数据（注册）
+        instance = form.save()  # 因为我们使用的时ModelForm，所以可以直接使用.save()方法。
+        # form.save() 返回的用户对象 等同于 models.UserInfo.objects.fitler()取当前这条数据
+
+        # 从数据库种获取相应的价格策略对象
+        price_policy_instance = models.PricePolicy.objects.filter('category=1', title='个人免费版').first()
+
+        # 创建交易记录：
+        models.Transaction.objects.create(
+            status=2,
+            order=str(uuid.uuid4()), # uuid用于生成随机字符串
+            user=instance,
+            price_policy=price_policy_instance,
+            count=0,
+            price=0,
+            start_datetime=datetime.datetime.now(),
+
+        )
+
         # 事实上.save()方法等价于下面这几行，且可以自动pop掉数据表中没有的字段
         # data = form.cleaned_data
         # data.pop('code')
