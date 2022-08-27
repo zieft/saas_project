@@ -8,8 +8,33 @@
     <div class="container-fluid"> <!-- 随浏览器大小平铺 -->
         <!--data-toggle表示点击按钮后要出一个对话框，target就是要显示的对话框的id-->
         <a class="btn btn-primary" data-toggle="modal" data-target="#addModal"><i class="fa fa-plus-circle"
-                                                                                  aria-hidden="true"></i> 新建项目</a>
-
+                                                                                  aria-hidden="true"></i> 新建项目
+        </a>
+        <!-- https://v3.bootcss.com/components/#panels -->
+        <div class="panel panel-default">
+            <div class="panel-heading"><i class="fa fa-star" aria-hidden="true"></i> 星标项目</div>
+            <div class="panel-body">
+                {% for item in project_dict.star %}
+                    <div>{{ item.name }}</div>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="panel panel-default">
+            <div class="panel-heading"><i class="fa fa-bars" aria-hidden="true"></i> 我创建的项目</div>
+            <div class="panel-body">
+                {% for item in project_dict.my %}
+                    <div>{{ item.name }}</div>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="panel panel-default">
+            <div class="panel-heading"><i class="fa fa-users" aria-hidden="true"></i> 我参与的</div>
+            <div class="panel-body">
+                {% for item in project_dict.join %}
+                    <div>{{ item.name }}</div>
+                {% endfor %}
+            </div>
+        </div>
     </div>
 
     <!-- Modal 来自https://v3.bootcss.com/javascript/#modals-->
