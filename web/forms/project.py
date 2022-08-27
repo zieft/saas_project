@@ -6,6 +6,7 @@ from web import models
 
 class ProjectModelForm(BootstrapForm, forms.ModelForm):
     # desc = forms.CharField(widget=forms.Textarea(attrs={'xx': 123})) # 让CharField用上Textarea的样式（大输入框）
+    bootstrap_class_exclude = ['color']  # 覆写父类的空列表，在这个列表里的字段不应用bootstrap样式
 
     class Meta:
         model = models.Project
@@ -13,6 +14,7 @@ class ProjectModelForm(BootstrapForm, forms.ModelForm):
         # 批量重写字段的插件
         widgets = {
             'desc': forms.Textarea(attrs={'xx': 123}),  # attrs按需添加
+            'color': forms.RadioSelect,  # 把下拉框变成Radio选择框
         }
 
     def __init__(self, request, *args, **kwargs):
