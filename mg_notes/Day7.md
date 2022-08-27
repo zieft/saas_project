@@ -24,3 +24,41 @@
 1.2 处理样式
 
 ## 2. 星标项目
+
+2.1 添加星标
+
+```
+我创建的项目：project的star设为True即可。
+我参与的项目：projectuser的star设为True即可。
+```
+
+2.2 去除星标
+
+```
+判断项目是不是我创建的：
+如果是
+	我创建的项目：project的star设为False即可。
+	我参与的项目：projectuser的star设为False即可。
+```
+
+## 3. 颜色选择
+
+3.1 部分样式应用BootStrap
+
+3.2 定制ModelForm的插件
+
+```python
+class ProjectModelForm(BootStrapForm, forms.ModelForm):
+    
+    class Meta:
+        model = models.Model
+        fields = '__all__'
+        
+        widgets = {
+            'desc': forms.Textarea, 
+            'color': ColorRadioSelect(attrs={'class': 'color-radio'})
+        }
+```
+
+3.3 项目颜色选择器
+
