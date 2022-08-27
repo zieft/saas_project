@@ -1,6 +1,7 @@
 from django import forms
 from django.core.exceptions import ValidationError
 from web.forms.bootstrap import BootstrapForm
+from web.forms.widgets import ColorRadioSelect
 from web import models
 
 
@@ -14,7 +15,7 @@ class ProjectModelForm(BootstrapForm, forms.ModelForm):
         # 批量重写字段的插件
         widgets = {
             'desc': forms.Textarea(attrs={'xx': 123}),  # attrs按需添加
-            'color': forms.RadioSelect,  # 把下拉框变成Radio选择框
+            'color': ColorRadioSelect(attrs={'class': 'color-radio'}),  # 把下拉框变成Radio选择框，并加入css样式color-radio
         }
 
     def __init__(self, request, *args, **kwargs):
