@@ -11,7 +11,9 @@ urlpatterns = [
     url(r'^send/sms/$', account.send_sms_fake, name='send_sms'),
     url(r'^index/$', home.index, name='index'),
 
-
     url(r'^project/list/$', project.project_list, name='project_list'),
+    # project_type: {'my', 'join'}
+    # eg.: /project/start/join/12/
+    url(r'^project/star/(?P<project_type>\w+)/(?P<project_id>\d+)/$', project.project_star, name='project_star'),
 
 ]

@@ -105,7 +105,7 @@
                         </a>
                         <div class="info">
                             <div>
-                                <a href="#">
+                                <a href="{% url 'project_star' project_type='my' project_id=item.id %}">
                                     <i class="fa fa-star" aria-hidden="true" style="color: gray;"></i>
                                 </a>
                                 <span>{{ item.creator.username }}</span>
@@ -130,7 +130,7 @@
                         </a>
                         <div class="info">
                             <div>
-                                <a href="#">
+                                <a href="{% url 'project_star' project_type='join' project_id=item.id %}">
                                     <i class="fa fa-star" aria-hidden="true" style="color: gray"></i>
                                 </a>
                                 <span>{{ item.creator.username }}</span>

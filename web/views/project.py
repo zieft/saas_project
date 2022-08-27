@@ -1,6 +1,5 @@
-from django.shortcuts import render
-from web.forms.project import ProjectModelForm
-from django.http import JsonResponse
+from django.shortcuts import render, redirect
+from django.http import JsonResponse, HttpResponse
 
 from web.forms.project import ProjectModelForm
 from web import models
@@ -51,3 +50,21 @@ def project_list(request):
         return JsonResponse({'status': True})
 
     return JsonResponse({'status': False, 'error': form.errors})
+
+
+def project_star(request, project_type, project_id):
+    """ 星标项目 """
+    if project_type == 'my':
+        models.Project.objects.filter(
+            id=project_id,
+            creator=request.tracer.user  # 确保是用户本人操作自己的项目
+        ).update(star=True)
+        return redirect('project_list')
+    if project_type == 'join':
+        models.ProjectUser.objects.filter(
+            project_id=project_id,
+            user=request.tracer.user,  # 确保是我参与的项目
+        ).update(star=True)
+        return redirect('project_list')
+
+    return HttpResponse("请求错误")
