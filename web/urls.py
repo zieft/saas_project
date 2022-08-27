@@ -15,5 +15,6 @@ urlpatterns = [
     # project_type: {'my', 'join'}
     # eg.: /project/start/join/12/
     url(r'^project/star/(?P<project_type>\w+)/(?P<project_id>\d+)/$', project.project_star, name='project_star'),
+    url(r'^project/unstar/(?P<project_type>\w+)/(?P<project_id>\d+)/$', project.project_unstar, name='project_unstar'),
 
 ]

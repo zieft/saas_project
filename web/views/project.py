@@ -23,7 +23,7 @@ def project_list(request):
         )
         for project in my_project_list:
             if project.star:
-                project_dict['star'].append(project)
+                project_dict['star'].append({'value': project, 'type': 'my'})
             else:
                 project_dict['my'].append(project)
 
@@ -32,7 +32,7 @@ def project_list(request):
         )
         for project_user in join_project_list:
             if project_user.star:
-                project_dict['star'].append(project_user.project)
+                project_dict['star'].append({'value': project_user.project, 'type': 'my'})
             else:
                 project_dict['join'].append(project_user.project)
 
@@ -65,6 +65,24 @@ def project_star(request, project_type, project_id):
             project_id=project_id,
             user=request.tracer.user,  # 确保是我参与的项目
         ).update(star=True)
+        return redirect('project_list')
+
+    return HttpResponse("请求错误")
+
+
+def project_unstar(request, project_type, project_id):
+    """ 取消星标项目 """
+    if project_type == 'my':
+        models.Project.objects.filter(
+            id=project_id,
+            creator=request.tracer.user  # 确保是用户本人操作自己的项目
+        ).update(star=False)
+        return redirect('project_list')
+    if project_type == 'join':
+        models.ProjectUser.objects.filter(
+            project_id=project_id,
+            user=request.tracer.user,  # 确保是我参与的项目
+        ).update(star=False)
         return redirect('project_list')
 
     return HttpResponse("请求错误")

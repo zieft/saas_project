@@ -64,30 +64,35 @@
 {% endblock %}
 
 {% block content %}
-    <div class="container-fluid"> <!-- 随浏览器大小平铺 -->
+    <div class="container-fluid project"> <!-- 随浏览器大小平铺 -->
         <!--data-toggle表示点击按钮后要出一个对话框，target就是要显示的对话框的id-->
-        <a class="btn btn-primary" data-toggle="modal" data-target="#addModal"><i class="fa fa-plus-circle"
-                                                                                  aria-hidden="true"></i> 新建项目
-        </a>
+        <div style="margin: 10px 0;">
+            <a class="btn btn-primary" data-toggle="modal" data-target="#addModal">
+                <i class="fa fa-plus-circle"
+                   aria-hidden="true"></i>
+                新建项目
+            </a>
+        </div>
+
         <!-- https://v3.bootcss.com/components/#panels -->
         <div class="panel panel-default">
             <div class="panel-heading"><i class="fa fa-star" aria-hidden="true"></i> 星标项目</div>
             <div class="panel-body">
                 {% for item in project_dict.star %}
                     <div class="item">
-                        <a href="#" class="title" style="background-color: {{ item.get_color_display }};">
-                            {{ item.name }}
+                        <a href="#" class="title" style="background-color: {{ item.value.get_color_display }};">
+                            {{ item.value.name }}
                         </a>
                         <div class="info">
                             <div>
-                                <a href="#">
+                                <a href="{% url 'project_unstar' project_type=item.type project_id=item.value.id %}">
                                     <i class="fa fa-star" aria-hidden="true" style="color: #f0ad4e"></i>
                                 </a>
-                                <span>{{ item.creator.username }}</span>
+                                <span>{{ item.value.creator.username }}</span>
                             </div>
                             <div>
                                 <i class="fa fa-user-o" aria-hidden="true"></i>
-                                <span>{{ item.join_count }}</span>
+                                <span>{{ item.value.join_count }}</span>
                             </div>
                         </div>
                     </div>
