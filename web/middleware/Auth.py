@@ -1,7 +1,9 @@
 import datetime
-from django.utils.deprecation import MiddlewareMixin
-from django.shortcuts import redirect
+
 from django.conf import settings
+from django.shortcuts import redirect
+from django.utils.deprecation import MiddlewareMixin
+
 from web import models
 
 
@@ -9,9 +11,11 @@ class Tracer(object):
     def __init__(self):
         self.user = None
         self.price_policy = None
+        self.project = None
 
 
 class AuthMiddleware(MiddlewareMixin):
+    # 下面定义的方法是按顺序执行，process_request执行完后，request.tracer就可以被后面的方法用到了
     def process_request(self, request):
         """
         如果用户已登录，则在request中赋值
@@ -74,3 +78,37 @@ class AuthMiddleware(MiddlewareMixin):
         #         request.price_policy = models.PricePolicy.objects.filter(category=1, title="个人免费版").first()
         #     else:
         #         request.tracer.price_policy = _object.price_policy
+
+    def process_view(self, request, view, args, kwargs):
+        """ 在进入本中间件之前，确保路由匹配先得通过，否则无法拿到project_id """
+
+        # 1.判断URL是否已manage开头，如果是继续2.，否则重定向
+        if not request.path_info.startswith('/manage/'):
+            return  # return 表示验证通过，继续往下走第2步
+
+        # 1.5 获取project_id和用户对象
+        project_id = kwargs.get('project_id')
+        user_object = request.tracer.user
+
+        # 2. 判断是不是我创建的
+        project_object = models.Project.objects.filter(
+            creator=user_object,
+            id=project_id
+        ).first()
+
+        if project_object:  # if是我创建的
+            request.tracer.project = project_object
+            return
+
+        # 2.5 不是我创建的有可能是我参与的，先获取我参与的项目对象
+        project_user_object = models.ProjectUser.objects.filter(
+            user=request.tracer.user,
+            project_id=project_id
+        ).first()
+
+        if project_user_object:  # if是我参与的
+            request.tracer.project = project_user_object.project
+            return
+
+        # 以上判断都不满足的，重定向
+        return redirect('project_list')
