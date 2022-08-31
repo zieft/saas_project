@@ -62,3 +62,65 @@ class ProjectModelForm(BootStrapForm, forms.ModelForm):
 
 3.3 项目颜色选择器
 
+## 4. 切换菜单
+
+```
+1. 从数据库获取
+	我创建的
+	我参与的
+2. 循环显示
+3. 当前页面需要显示 / 其他页面也需要显示[使用inclusion_tag实现]
+```
+
+## 5.项目管理
+
+进入项目后，导航条显示更多功能按钮
+
+进入项目后的路由规划
+
+```
+/manage/项目id/功能/zi'gong'negn
+
+/manage/项目id/dashboard
+/manage/项目id/issues
+/manage/项目id/statistics
+/manage/项目id/file
+/manage/项目id/wiki
+/manage/项目id/setting
+```
+
+##### 5.1 进入项目在导航条展示功能菜单
+
+条件：进入项目后
+
+5.1.1 如何判定是否进入项目？
+
+```
+1.判断url是否是manage开头的
+2.选择的项目（project_id）是不是我创建的or我参与的
+```
+
+解决办法：【使用中间件】
+
+##### 5.1.2 显示菜单栏
+
+给中间件中的request.tracer增加新成员变量project，验证是不是我的合法项目（我创建的or我参与的）并将通过的项目object保存在tracer中。在前端就可以通过判断
+request.tracer.project 来判断改是否已经进入项目。
+
+##### 5.1.3 默认选中菜单
+
+利用inclusiontag，动态改变<li>标签的class属性。
+
+# 总结
+
+1. 项目实现思路
+2. 星标、取消星标
+3. inclusion_tag实现项目切换
+4. 项目菜单
+    1. 中间件 process_view
+    2. inclusion_tag
+    3. 菜单选中状态
+    4. 路由分发
+        1. include("some.url")
+        2. include([some, url])
+5. 颜色选择： 源码 + 扩展 【不求甚解】
