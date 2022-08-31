@@ -1,5 +1,5 @@
 {% for item in data_list %}
-    <li><a href="{{ item.url }}">
+    <li {% if item.class %} class="{{ item.class }}"{% endif %} ><a href="{{ item.url }}">
         {{ item.title }}
     </a></li>
 
