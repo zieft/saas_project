@@ -1,6 +1,6 @@
-import django.contrib.auth.models
 from django.db import models
-from django.contrib.auth.models import User
+from django.db import models
+
 
 # Create your models here.
 class UserInfo(models.Model):
@@ -107,7 +107,17 @@ class ProjectUser(models.Model):
 
     project = models.ForeignKey(verbose_name='项目', to='Project')
 
-
     star = models.BooleanField(verbose_name='星标', default=False)
 
     create_datetime = models.DateTimeField(verbose_name='加入时间', auto_now_add=True)
+
+
+class Wiki(models.Model):
+    project = models.ForeignKey(verbose_name='项目', to='Project')
+    title = models.CharField(verbose_name='标题', max_length=32)
+    content = models.TextField(verbose_name='内容')
+
+    # 自关联，related_name用于反向查找
+    parent = models.ForeignKey(verbose_name='父级文章', to='Wiki', null=True, blank=True, related_name='children')
+    # django 4里写法稍有不同
+    # parent = models.ForeignKey(verbose_name='父级文章', to='Wiki', on_delete=models.SET_NULL, null=True, blank=True)
