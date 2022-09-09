@@ -1,5 +1,4 @@
 from django.db import models
-from django.db import models
 
 
 # Create your models here.
@@ -119,5 +118,10 @@ class Wiki(models.Model):
 
     # 自关联，related_name用于反向查找
     parent = models.ForeignKey(verbose_name='父级文章', to='Wiki', null=True, blank=True, related_name='children')
+
     # django 4里写法稍有不同
     # parent = models.ForeignKey(verbose_name='父级文章', to='Wiki', on_delete=models.SET_NULL, null=True, blank=True)
+
+    def __str__(self):
+        """ 使父级文章下拉菜单中，显示文章名称 """
+        return self.title

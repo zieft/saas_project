@@ -28,6 +28,7 @@ urlpatterns = [
         url(r'^statistics/$', manage.statistics, name='statistics'),
         url(r'^file/$', manage.file, name='file'),
         url(r'^wiki/$', wiki.wiki, name='wiki'),  # 不能在manage.py中导入wiki，要直接从url.py中导入
+        url(r'^wiki/add/$', wiki.wiki_add, name='wiki_add'),  # 不能在manage.py中导入wiki，要直接从url.py中导入
         url(r'^setting/$', manage.setting, name='setting'),
     ])),
 
