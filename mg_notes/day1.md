@@ -25,13 +25,13 @@
 
    ```
    假设：目前电脑有 py27
-   virtualenv 环境名称 --python==python3.6
+   virtualenv 环境名称 --python=python3.6
    ```
 
 3. 进入虚拟环境
 
    ```
-   source ./saas/bin/active
+   source ./saas/bin/activate
    ```
 
    进入虚拟环境本质上是用source命令去执行虚拟环境文件夹bin目录里的active文件

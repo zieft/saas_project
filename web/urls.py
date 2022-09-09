@@ -1,7 +1,7 @@
 # 路由划分
 from django.conf.urls import url, include
 
-from web.views import account, home, project, manage
+from web.views import account, home, project, manage, wiki
 
 urlpatterns = [
     url(r'^register/$', account.register, name='register'),  # name可以方便反向解析
@@ -27,7 +27,7 @@ urlpatterns = [
         url(r'^issues/$', manage.issues, name='issues'),
         url(r'^statistics/$', manage.statistics, name='statistics'),
         url(r'^file/$', manage.file, name='file'),
-        url(r'^wiki/$', manage.wiki, name='wiki'),
+        url(r'^wiki/$', wiki.wiki, name='wiki'),  # 不能在manage.py中导入wiki，要直接从url.py中导入
         url(r'^setting/$', manage.setting, name='setting'),
     ])),
 

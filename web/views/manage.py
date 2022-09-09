@@ -17,9 +17,10 @@ def file(request, project_id):
     return render(request, 'file.html')
 
 
+""" wiki将会有很多子功能，所以单独定义在wiki.py中
 def wiki(request, project_id):
     return render(request, 'wiki.html')
-
+"""
 
 def setting(request, project_id):
     return render(request, 'setting.html')

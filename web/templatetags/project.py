@@ -19,7 +19,7 @@ def all_project_list(request):  # 这不是视图函数，所以request参数需
     # 2. 获取我参与的所有项目
     join_project_list = models.ProjectUser.objects.filter(user=request.tracer.user)
 
-    return {'my': my_project_list, 'join': join_project_list}
+    return {'my': my_project_list, 'join': join_project_list, 'request': request}
     # 这里返回的内容可以直接传到上面的html页面
 
 

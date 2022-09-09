@@ -144,9 +144,11 @@ WHITE_REGEX_URL_LIST = [
     '/image/code/',
     '/login/sms',
     '/index/',
+    '/admin/',
+
 ]
 
 try:
     from .local_settings import *
 except ImportError:
-    pass
+    from .local_settings_docker import *
