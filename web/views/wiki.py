@@ -12,10 +12,11 @@ def wiki(request, project_id):
 def wiki_add(request, project_id):
     """ 添加文章 """
     if request.method == 'GET':  # 用户访问页面
-        form = WikiModelForm()
+        form = WikiModelForm(request)
         return render(request, 'wiki_add.html', {'form': form})
+
     # post，用户提交表单
-    form = WikiModelForm(request.POST)
+    form = WikiModelForm(request, data=request.POST)
     if form.is_valid():
         form.instance.project = request.tracer.project  # 这一项不是用户填写的，因此需要手动地添加
         form.save()
