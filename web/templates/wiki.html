@@ -69,11 +69,17 @@
                 success: function (res) {
                     if (res.status) {
                         $.each(res.data, function (index, item) {
+                            // 生成<li id='id_1'><a href="">目录名称</a></li>
+                            var li = $('<li>').attr('id', 'id_' + item.id).append(
+                                $('<a>').text(item.title)).append(
+                                $("<ul>")
+                            );
                             if (!item.parent_id) {
-                                // 生成<li id='id_1'><a href="">目录2</a></li>
-                                var li = $('<li>').attr('id', 'id_' + item.id).append($('<a>').text(item.title));
                                 // 添加到catalog中
                                 $('#catalog').append(li)
+                            } else {
+                                // 找父文章的子标签<ul>，并在里面加入生成的<li>标签
+                                $("#id_" + item.parent_id).children('ul').append(li) // children表示当前标签的内部标签
                             }
                         })
                     } else {
