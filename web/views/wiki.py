@@ -1,6 +1,8 @@
+from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.urls import reverse
 
+from web import models
 from web.forms.wiki import WikiModelForm
 
 
@@ -25,3 +27,13 @@ def wiki_add(request, project_id):
         return redirect(url)
 
     return render(request, 'wiki_add.html', {'form': form})  # 验证不通过，显示错误信息
+
+
+def wiki_catalog(request, project_id):
+    """ 获取wiki的目录 """
+    # 获取当前项目的所有目录: data = QuerySet类型
+    # data = models.Wiki.objects.filter(project=request.tracer.project).values_list('id', 'title', 'parent_id') # 前端获取id要用item[0]
+    data = models.Wiki.objects.filter(project=request.tracer.project).values('id', 'title',
+                                                                             'parent_id')  # 前端获取id可以直接item.id
+    # JsonResponse会调用json.dumps()不能直接处理QuerySet类型，所以要先转换成列表
+    return JsonResponse({'status': True, 'data': list(data)})

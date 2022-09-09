@@ -34,7 +34,12 @@
                 </div>
             </div>
             <div class="panel-body">
-                <div class="col-sm-3 title-list">目录</div>
+                <div class="col-sm-3 title-list">
+                    <ul id="catalog">
+                        {# <li><a href=""></a></li> #}
+
+                    </ul>
+                </div>
                 <div class="col-sm-9 content">
                     <div style="text-align: center; margin-top: 50px">
                         <h4>《{{ request.tracer.project.name }}》wiki文档库</h4>
@@ -48,4 +53,34 @@
         </div>
 
     </div>
+{% endblock %}
+
+{% block js %}
+    <script>
+        $(function () {
+            initCatalog();
+        });
+
+        function initCatalog() {
+            $.ajax({
+                url: "{% url 'wiki_catalog' project_id=request.tracer.project.id %}",
+                type: 'GET',
+                dataType: "JSON",
+                success: function (res) {
+                    if (res.status) {
+                        $.each(res.data, function (index, item) {
+                            if (!item.parent_id) {
+                                // 生成<li id='id_1'><a href="">目录2</a></li>
+                                var li = $('<li>').attr('id', 'id_' + item.id).append($('<a>').text(item.title));
+                                // 添加到catalog中
+                                $('#catalog').append(li)
+                            }
+                        })
+                    } else {
+
+                    }
+                }
+            })
+        }
+    </script>
 {% endblock %}
