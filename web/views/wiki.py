@@ -8,12 +8,15 @@ from web.forms.wiki import WikiModelForm
 
 def wiki(request, project_id):
     """ wiki 首页的展示"""
-    wiki_id = request.GET.get('wiki_id')
-    if wiki_id:  # 如果用户请求的URL中有?wiki_id=
-        print('文章详细')
-    else:
-        print('wiki首页')
+    wiki_id = request.GET.get('wiki_id')  # wiki_id有值，表示用户请求查看文章详细内容
+    # 用户可能在url给wiki_id传入非数字的字符，导致后端无法查询，所以要判断wiki_id是不是数
+
+    if not wiki_id or not wiki_id.isdecimal():
         return render(request, 'wiki.html')
+
+    wiki_object = models.Wiki.objects.filter(id=wiki_id, project_id=project_id).first()
+
+    return render(request, 'wiki.html', {'wiki_object': wiki_object})
 
 
 def wiki_add(request, project_id):

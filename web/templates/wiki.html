@@ -41,13 +41,17 @@
                     </ul>
                 </div>
                 <div class="col-sm-9 content">
-                    <div style="text-align: center; margin-top: 50px">
-                        <h4>《{{ request.tracer.project.name }}》wiki文档库</h4>
-                        <a href="{% url 'wiki_add' project_id=request.tracer.project.id %}">
-                            <i class="fa fa-plus-circle" aria-hidden="true"></i>新建文章
+                    {% if wiki_object %}
+                        {{ wiki_object.content }}
+                    {% else %}
+                        <div style="text-align: center; margin-top: 50px">
+                            <h4>《{{ request.tracer.project.name }}》wiki文档库</h4>
+                            <a href="{% url 'wiki_add' project_id=request.tracer.project.id %}">
+                                <i class="fa fa-plus-circle" aria-hidden="true"></i>新建文章
+                            </a>
+                        </div>
+                    {% endif %}
 
-                        </a>
-                    </div>
                 </div>
             </div>
         </div>
@@ -57,9 +61,9 @@
 
 {% block js %}
     <script>
-        // 新建一个全局变量反向生成并保存跟路由地址 http://127.0.0.1/manage/2/wiki/detail
+        // 新建一个全局变量反向生成并保存跟路由地址 http://127.0.0.1/manage/2/wiki
         // 后面通过给a标签添加href属性拼接后面的?wiki_id=1
-        var WIKI_DETAIL_URL = "{% url 'wiki_detail' project_id=request.tracer.project.id %}"
+        var WIKI_DETAIL_URL = "{% url 'wiki' project_id=request.tracer.project.id %}";
 
         $(function () {
             initCatalog();
@@ -67,14 +71,14 @@
 
         function initCatalog() {
             $.ajax({
-                url: "{% url 'wiki' project_id=request.tracer.project.id %}",
+                url: "{% url 'wiki_catalog' project_id=request.tracer.project.id %}",
                 type: 'GET',
                 dataType: "JSON",
                 success: function (res) {
                     if (res.status) {
                         $.each(res.data, function (index, item) {
                             // 动态生成文章网址
-                            var href = WIKI_DETAIL_URL + '?wiki_it=' + item.id;
+                            var href = WIKI_DETAIL_URL + '?wiki_id=' + item.id;
                             // 生成<li id='id_1'><a href="">目录名称</a></li>
                             var li = $('<li>').attr('id', 'id_' + item.id).append(
                                 $('<a>').text(item.title).attr('href', href)).append(
