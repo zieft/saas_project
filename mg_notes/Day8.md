@@ -9,11 +9,11 @@
 
 #### 1 表结构设计
 
-| id   | 标题 | 内容 | 项目id | 父id   |
-| ---- | ---- | ---- | ------ | ------ |
-| 1    |      |      |        | 自关联 |
-| 2    |      |      |        |        |
-| 3    |      |      |        |        |
+| id   | 标题 | 内容 | 项目id | 父id   | 深度 |
+| ---- | ---- | ---- | ------ | ------ | ---- |
+| 1    |      |      |        | 自关联 |      |
+| 2    |      |      |        |        |      |
+| 3    |      |      |        |        |      |
 
 #### 2 快速开发
 
@@ -80,7 +80,9 @@
      		</ul>
   ```
 
-  ![image-20220909193212109](C:\Users\zieft\AppData\Roaming\Typora\typora-user-images\image-20220909193212109.png)
+  ![](C:\Users\zieft\AppData\Roaming\Typora\typora-user-images\image-20220909193212109.png)
+
+![image-20220909212441711](C:\Users\zieft\AppData\Roaming\Typora\typora-user-images\image-20220909212441711.png)
 
 2.2 添加文章，左边目录不变，右边变成编辑器
 
