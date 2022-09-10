@@ -7,7 +7,7 @@ from web.forms.bootstrap import BootstrapForm
 class WikiModelForm(BootstrapForm, forms.ModelForm):
     class Meta:
         model = models.Wiki
-        exclude = ['project', ]
+        exclude = ['project', 'depth']  # 不在前端显示的字段
 
     def __init__(self, request, *args, **kwargs):
         super().__init__(*args, **kwargs)
