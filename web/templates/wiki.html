@@ -67,7 +67,7 @@
 
         function initCatalog() {
             $.ajax({
-                url: "{% url 'wiki_catalog' project_id=request.tracer.project.id %}",
+                url: "{% url 'wiki' project_id=request.tracer.project.id %}",
                 type: 'GET',
                 dataType: "JSON",
                 success: function (res) {

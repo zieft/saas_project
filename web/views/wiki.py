@@ -1,4 +1,4 @@
-from django.http import JsonResponse, HttpResponse
+from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.urls import reverse
 
@@ -8,7 +8,12 @@ from web.forms.wiki import WikiModelForm
 
 def wiki(request, project_id):
     """ wiki 首页的展示"""
-    return render(request, 'wiki.html')
+    wiki_id = request.GET.get('wiki_id')
+    if wiki_id:  # 如果用户请求的URL中有?wiki_id=
+        print('文章详细')
+    else:
+        print('wiki首页')
+        return render(request, 'wiki.html')
 
 
 def wiki_add(request, project_id):
@@ -47,7 +52,6 @@ def wiki_catalog(request, project_id):
     # JsonResponse会调用json.dumps()不能直接处理QuerySet类型，所以要先转换成列表
     return JsonResponse({'status': True, 'data': list(data)})
 
-
-def wiki_detail(request, project_id):
-    """ 查看文章详情 /detail?wiki_id=1, 2, 3..."""
-    return HttpResponse('查看文章详细')
+# def wiki_detail(request, project_id):
+#     """ 查看文章详情 /detail?wiki_id=1, 2, 3..."""
+#     return HttpResponse('查看文章详细')
