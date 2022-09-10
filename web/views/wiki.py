@@ -1,4 +1,4 @@
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect
 from django.urls import reverse
 
@@ -46,3 +46,8 @@ def wiki_catalog(request, project_id):
         'id', 'title', 'parent_id').order_by('depth', 'id')
     # JsonResponse会调用json.dumps()不能直接处理QuerySet类型，所以要先转换成列表
     return JsonResponse({'status': True, 'data': list(data)})
+
+
+def wiki_detail(request, project_id):
+    """ 查看文章详情 /detail?wiki_id=1, 2, 3..."""
+    return HttpResponse('查看文章详细')

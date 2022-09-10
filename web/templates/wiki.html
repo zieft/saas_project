@@ -57,6 +57,10 @@
 
 {% block js %}
     <script>
+        // 新建一个全局变量反向生成并保存跟路由地址 http://127.0.0.1/manage/2/wiki/detail
+        // 后面通过给a标签添加href属性拼接后面的?wiki_id=1
+        var WIKI_DETAIL_URL = "{% url 'wiki_detail' project_id=request.tracer.project.id %}"
+
         $(function () {
             initCatalog();
         });
@@ -69,9 +73,11 @@
                 success: function (res) {
                     if (res.status) {
                         $.each(res.data, function (index, item) {
+                            // 动态生成文章网址
+                            var href = WIKI_DETAIL_URL + '?wiki_it=' + item.id;
                             // 生成<li id='id_1'><a href="">目录名称</a></li>
                             var li = $('<li>').attr('id', 'id_' + item.id).append(
-                                $('<a>').text(item.title)).append(
+                                $('<a>').text(item.title).attr('href', href)).append(
                                 $("<ul>")
                             );
                             if (!item.parent_id) {
