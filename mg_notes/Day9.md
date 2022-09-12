@@ -49,7 +49,38 @@
                     })
                 }
         ```
-        
-        
-    
 
+
+4. ### 使用markdown进行预览
+
+   ``` 
+   
+   1. 内容区域使用div标签包裹，并设置id
+   <div id="previewMarkdown">
+   	<textarea name="" id="" cols="30" rows="10">
+   		{{ wiki_object.content }}
+   	</textarea>
+   </div>
+   
+   2.引入css，js
+   <link rel="stylesheet" href="{% static 'plugin/editor-md/css/editormd.preview.min.css' %}">
+   
+   <script src="{% static 'plugin/editor-md/editormd.min.js' %}"></script>
+   <script src="{% static 'plugin/editor-md/lib/marked.min.js' %}"></script>
+   <script src="{% static 'plugin/editor-md/lib/prettify.min.js' %}"></script>
+   <script src="{% static 'plugin/editor-md/lib/raphael.min.js' %}"></script>
+   <script src="{% static 'plugin/editor-md/lib/underscore.min.js' %}"></script>
+   <script src="{% static 'plugin/editor-md/lib/sequence-diagram.min.js' %}"></script>
+   <script src="{% static 'plugin/editor-md/lib/flowchart.min.js' %}"></script>
+   <script src="{% static 'plugin/editor-md/lib/jquery.flowchart.min.js' %}"></script>
+   
+   3.初始化
+   function initPreviewMarkdown () {
+   	editormd.markdownToHTML('previewMarkdown',{
+   		htmlDebode: 'style,script,iframe',  // 防止script攻击等
+   });
+   }
+   ```
+
+
+5. ### 从本地上传图片，暂未实现
