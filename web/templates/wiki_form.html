@@ -81,6 +81,7 @@
         // 新建一个全局变量反向生成并保存跟路由地址 http://127.0.0.1/manage/2/wiki
         // 后面通过给a标签添加href属性拼接后面的?wiki_id=1
         var WIKI_DETAIL_URL = "{% url 'wiki' project_id=request.tracer.project.id %}";
+        var WIKI_UPLOAD_URL = "{% url 'wiki_upload' project_id=request.tracer.project.id %}";
 
         $(function () {
             initCatalog();
@@ -93,6 +94,9 @@
                 placeholder: "请输入内容",
                 height: 500,
                 path: "{% static 'plugin/editor-md/lib/' %}",
+                imageUpload: true, // 使能上传本地图片
+                imageFormats: ['jpg', 'jpeg', 'png', 'gif'],
+                imageUploadURL: WIKI_UPLOAD_URL, // 上传到哪个地址
             })
         }
 

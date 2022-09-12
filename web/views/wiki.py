@@ -93,3 +93,8 @@ def wiki_edit(request, project_id, wiki_id):
 
         return redirect(preview_url)
     return render(request, 'wiki_form.html', {'form': form})
+
+
+def wiki_upload(request, project_id):
+    """ Markdown插件上传图片 """
+    pass
