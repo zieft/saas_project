@@ -46,11 +46,22 @@
                         <form method="post">
                             {% csrf_token %}
                             {% for field in form %}
-                                <div class="form-group">
-                                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-                                    {{ field }}
-                                    <span class="error-msg">{{ field.errors.0 }}</span>
-                                </div>
+                                {% if field.name == 'content' %}
+                                    <div class="form-group">
+                                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                                        <div id="editor">
+                                            {{ field }}
+                                        </div>
+
+                                        <span class="error-msg">{{ field.errors.0 }}</span>
+                                    </div>
+                                {% else %}
+                                    <div class="form-group">
+                                        <lable for="{{ firld.id_for_label }}">{{ field.label }}</lable>
+                                        {{ field }}
+                                        <span class="error-msg">{{ field.errors.0 }}</span>
+                                    </div>
+                                {% endif %}
                             {% endfor %}
                             <button type="submit" class="btn btn-primary">提 交</button>
                         </form>
