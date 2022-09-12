@@ -1,13 +1,13 @@
-import uuid
 import datetime
-
-import django_redis
-from django.shortcuts import render, HttpResponse, redirect
-from web.forms.account import RegisterModelForm, SendSmsForm, LoginSMSForm, \
-    SendSmsFormFake, LoginForm
+import uuid
 
 from django.http import JsonResponse
+from django.shortcuts import render, HttpResponse, redirect
+from django_redis import get_redis_connection
+
 from web import models
+from web.forms.account import RegisterModelForm, SendSmsForm, LoginSMSForm, \
+    SendSmsFormFake, LoginForm
 
 
 def register(request):
@@ -103,7 +103,9 @@ def send_sms(request):
 def send_sms_fake(request):
     form = SendSmsFormFake(request, data=request.GET)
     if form.is_valid():
-        return JsonResponse({'status': True})
+        conn = get_redis_connection()
+        code = conn.get(form.cleaned_data.get('mobile_phone')).decode('utf-8')
+        return JsonResponse({'status': True, 'code': code})  # todo：以后要把code去掉
 
     return JsonResponse({'status': False, 'error': form.errors})
 

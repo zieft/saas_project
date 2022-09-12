@@ -118,15 +118,16 @@
                     url: "{% url 'send_sms' %}", // http://www.xxx.com/index/?k1=123&k2=567
                     type: "GET",
                     // data: {k1: 123, k2: 567},
-                    data: { mobile_phone: mobilePhone, tpl: "register"},
+                    data: {mobile_phone: mobilePhone, tpl: "register"},
                     dataType: "JSON", // 将服务端返回的数据序列字符串 变成 JSON格式
-                    success: function (res){
+                    success: function (res) {
                         // 如果ajax请求发送成功，并且获得后端返回来的res，则自动执行本函数
-                        if(res.status){
+                        if (res.status) {
                             // console.log("发送成功，进入倒计时")
+                            console.log(res);
                             sendSmsRemind();
 
-                        }else{
+                        } else {
                             // 错误信息
                             console.log(res); // {status:False, error:{mobile_phone:["错误信息"]}}
                             // $.each是jquery提供的for循环方法,

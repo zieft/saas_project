@@ -1,16 +1,17 @@
 # views中所用到的所有ModelForm，都放在forms文件夹中，方便管理
 
 import random
-from django import forms
-from web import models
-from django.core.validators import RegexValidator
-from django.core.exceptions import ValidationError
-from django.conf import settings
 
+from django import forms
+from django.conf import settings
+from django.core.exceptions import ValidationError
+from django.core.validators import RegexValidator
+from django_redis import get_redis_connection
+
+from utils import encrypt
 # from utils.tencent.sms import send_sms_single
 from utils.AWS.sms import send_sms_single
-from django_redis import get_redis_connection
-from utils import encrypt
+from web import models
 from web.forms.bootstrap import BootstrapForm
 
 
@@ -313,7 +314,7 @@ class LoginForm(BootstrapForm, forms.Form):
         if not code_from_session:
             raise ValidationError("验证码已过期，请重新获取")
 
-        if code.upper().strip() != code_from_session.upper().strip(): # 大小写不敏感
+        if code.upper().strip() != code_from_session.upper().strip():  # 大小写不敏感
             raise ValidationError("验证码输入错误")
 
         return code
