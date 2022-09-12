@@ -84,7 +84,17 @@
 
         $(function () {
             initCatalog();
+            initEditorMd(); // 初始化编辑器
         });
+
+        function initEditorMd() {
+            // 第一个参数就是需要应用editor的标签id
+            editormd('editor', {
+                placeholder: "请输入内容",
+                height: 500,
+                path: "{% static 'plugin/editor-md/lib/' %}",
+            })
+        }
 
         function initCatalog() {
             $.ajax({
