@@ -1,6 +1,8 @@
 {% extends 'layout/manage.html' %}
+{% load static %}
 
 {% block css %}
+    <link rel="stylesheet" href="{% static 'plugin/editor-md/css/editormd.min.css' %}">
     <style>
         .title-list {
             border-right: 1px solid #dddddd;
@@ -74,6 +76,7 @@
 {% endblock %}
 
 {% block js %}
+    <script src="{% static 'plugin/editor-md/editormd.min.js' %}"></script>
     <script>
         // 新建一个全局变量反向生成并保存跟路由地址 http://127.0.0.1/manage/2/wiki
         // 后面通过给a标签添加href属性拼接后面的?wiki_id=1
