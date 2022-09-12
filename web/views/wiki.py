@@ -55,6 +55,14 @@ def wiki_catalog(request, project_id):
     # JsonResponse会调用json.dumps()不能直接处理QuerySet类型，所以要先转换成列表
     return JsonResponse({'status': True, 'data': list(data)})
 
+
 # def wiki_detail(request, project_id):
 #     """ 查看文章详情 /detail?wiki_id=1, 2, 3..."""
 #     return HttpResponse('查看文章详细')
+
+def wiki_delete(request, project_id, wiki_id):
+    """ 删除当前文章 """
+    # 一定也要按文章id查询，这样就不会通过url删除别人的文章
+    models.Wiki.objects.filter(project_id=project_id, id=wiki_id).delete()
+    url = reverse('wiki', kwargs={'project_id': project_id})
+    return redirect(url)
