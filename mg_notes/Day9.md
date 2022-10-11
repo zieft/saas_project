@@ -169,3 +169,6 @@ print(response['ETag'])
 
 5.2 markdown上传图片到cos
 
+- cos上传文件：接受markdown上传的文件，再传到cos上
+- markdown 上传图片
+

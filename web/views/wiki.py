@@ -1,7 +1,10 @@
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.urls import reverse
+from django.views.decorators.csrf import csrf_exempt
 
+from utils.encrypt import uid
+from utils.tencent.cos import upload_file
 from web import models
 from web.forms.wiki import WikiModelForm
 
@@ -95,6 +98,28 @@ def wiki_edit(request, project_id, wiki_id):
     return render(request, 'wiki_form.html', {'form': form})
 
 
+@csrf_exempt  # 此装饰器将免除本视图函数的csrf认证
 def wiki_upload(request, project_id):
     """ Markdown插件上传图片 """
-    pass
+
+    image_object = request.FILES.get('editormd-image-file')
+
+    # 为了防止桶内文件名重复，先给文件改个名
+    ext = image_object.name.rsplit('.')[-1]  # 获取上传文件的后缀名
+    key = "{}.{}".format(uid(request.tracer.user.mobile_phone), ext)  # 上传到bucket里的名称
+
+    image_url = upload_file(
+        request.tracer.project.bucket,
+        request.tracer.project.region,
+        image_object,
+        key
+    )
+
+    # 上传结果通知给markdown组件的固定格式
+    result = {
+        'success': 1,
+        'message': None,
+        'url': image_url
+    }
+
+    return JsonResponse(result)
