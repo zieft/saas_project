@@ -15,6 +15,22 @@ def create_bucket(bucket, region=settings.COS_REGION):
         ACL='public-read',  # private, public-read, public-read-write
     )
 
+    cors_config = {  # 配置跨域规则
+        'CORSRule': [
+            {
+                'AllowedOrigin': '*',
+                'AllowedMethod': ['GET', 'PUT', 'HEAD', 'POST', 'DELETE'],
+                'AllowedHeader': '*',
+                'ExposeHeader': '*',
+                'MaxAgeSeconds': 500
+            }
+        ]
+    }
+    client.put_bucket_cors(
+        Bucket=bucket,
+        CORSConfiguration=cors_config
+    )
+
 
 def upload_file(bucket, region, file_object, key):
     config = CosConfig(Region=region, SecretId=secret_id, SecretKey=secret_key)
