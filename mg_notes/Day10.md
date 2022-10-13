@@ -207,9 +207,9 @@ def cos_credential(request):
            $("#uploadFile").change(function () {
                // 获取要上传的所有文件对象列表
                var files = $(this)[0].files;
-               $.each(files, function (index, fileObject) {
+               $.each(files, function (index, fileObject) { // $.each相当于闭包后的for循环
                    var fileName = fileObject.name;
-                   // 上传文件
+                   // 上传文件（异步）
                    cos.putObject({
                        Bucket: '',
                        Region: '',
@@ -234,7 +234,7 @@ def cos_credential(request):
 
 4. 跨域问题
 
-​ 相同的解决思路，创建桶的时候配置好跨域规则。
+相同的解决思路，创建桶的时候配置好跨域规则。
 
 ```python
 def create_bucket(bucket, region=settings.COS_REGION):
@@ -349,3 +349,62 @@ info = {
 info.func(); // 由info这个字典进行调用，故使用info内的局部变量
 ```
 
+#### 3.11 闭包
+
+```javascript
+data_list = [11,22,33]
+for(var i;i++;i<data.length){
+    console.log(i, data[i])
+}
+```
+
+```javascript
+data_list = [11,22,33]
+for(var i=0;i++;i<data.length){
+    // 循环发送三次ajax请求，假设执行一分钟
+    $.ajax({
+        url:"...",
+        data:{value: data_list[i]},
+        success:function(res){
+            // 一分钟之后，此回调函数才会执行
+        }
+    })
+}
+console.log('随便打印点什么') // 这个打印多长时间才会被执行？ 几乎瞬间就被执行，因为ajax是异步进行的
+```
+
+```javascript
+data_list = [11,22,33]
+for(var i=0;i++;i<data.length){  // 循环执行完了以后会把i存在全局变量中，跟python不一样
+    // 循环发送三次ajax请求，假设执行一分钟
+    $.ajax({
+        url:"...",
+        data:{value: data_list[i]},
+        success:function(res){
+            // 一分钟之后，此回调函数才会执行
+            console.log(i); //一分钟之后输出一次 2
+        }
+    })
+}
+console.log(i) // 瞬间输出2
+```
+
+```javascript
+data_list = [11,22,33]
+for(var i=0;i++;i<data.length){  // 循环执行完了以后会把i存在全局变量中，跟python不一样
+    // 循环发送三次ajax请求，假设执行一分钟
+    function xx(data) { // 通过函数进行了闭包
+    $.ajax({
+        url:"...",
+        data:{value: data_list[i]},
+        success:function(res){
+            // 一分钟之后，此回调函数才会执行
+            console.log(i); // 输出0， 1， 2
+        }
+    })}
+    xx(i)
+}
+console.log(i) // 瞬间输出2
+```
+
+注意事项：如果以后循环，循环内容要发送异步请求，异步任务成功之后：通过闭包来解决。
