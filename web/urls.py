@@ -1,7 +1,7 @@
 # 路由划分
 from django.conf.urls import url, include
 
-from web.views import account, home, project, manage, wiki
+from web.views import account, home, project, manage, wiki, file
 
 urlpatterns = [
     url(r'^register/$', account.register, name='register'),  # name可以方便反向解析
@@ -26,7 +26,6 @@ urlpatterns = [
         url(r'^dashboard/$', manage.dashboard, name='dashboard'),
         url(r'^issues/$', manage.issues, name='issues'),
         url(r'^statistics/$', manage.statistics, name='statistics'),
-        url(r'^file/$', manage.file, name='file'),
         url(r'^wiki/$', wiki.wiki, name='wiki'),  # 不能在manage.py中导入wiki，要直接从url.py中导入
         url(r'^wiki/add/$', wiki.wiki_add, name='wiki_add'),  # 不能在manage.py中导入wiki，要直接从url.py中导入
         url(r'^wiki/delete/(?P<wiki_id>\d+)/$', wiki.wiki_delete, name='wiki_delete'),
@@ -36,6 +35,9 @@ urlpatterns = [
         url(r'^wiki/catalog/$', wiki.wiki_catalog, name='wiki_catalog'),  # 不能在manage.py中导入wiki，要直接从url.py中导入
         # url(r'^wiki/detail/$', wiki.wiki_detail, name='wiki_detail'),
         url(r'^setting/$', manage.setting, name='setting'),
+
+        url(r'^file/$', file.file, name='file'),
+
     ])),
 
 ]
