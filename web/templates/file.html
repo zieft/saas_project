@@ -35,31 +35,42 @@
             <table class="table">
                 <thead>
                 <tr>
-                    <th>#</th>
-                    <th>First Name</th>
-                    <th>Last Name</th>
-                    <th>Username</th>
+                    <th>名称</th>
+                    <th>文件大小</th>
+                    <th>更新者</th>
+                    <th>更新时间</th>
+                    <th>操作</th>
                 </tr>
                 </thead>
                 <tbody>
-                <tr>
-                    <th scope="row">1</th>
-                    <td>Mark</td>
-                    <td>Otto</td>
-                    <td>@mdo</td>
-                </tr>
-                <tr>
-                    <th scope="row">2</th>
-                    <td>Jacob</td>
-                    <td>Thornton</td>
-                    <td>@fat</td>
-                </tr>
-                <tr>
-                    <th scope="row">3</th>
-                    <td>Larry</td>
-                    <td>the Bird</td>
-                    <td>@twitter</td>
-                </tr>
+                {% for item in file_object_list %}
+                    <tr>
+                        <td>
+                            {% if item.file_type == 2 %}
+                                <a href="{% url 'file' project_id=request.tracer.project.id %}?folder={{ item.id }}">
+                                    <i class="fa fa-folder" aria-hidden="true"></i>
+                                    {{ item.name }}
+                                </a>
+                            {% else %}
+                                <i class="fa fa-file" aria-hidden="true"></i>
+                                {{ item.name }}
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if item.file_type == 1 %}
+                                {{ item.file_size }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                        <td>{{ item.update_user.username }}</td>
+                        <td>{{ item.update_datetime }}</td>
+                        <td>
+                            编辑
+                            删除
+                        </td>
+                    </tr>
+                {% endfor %}
                 </tbody>
             </table>
         </div>
