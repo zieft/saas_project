@@ -45,7 +45,17 @@ def file(request, project_id):
         }
         return render(request, 'file.html', context)
 
-    form = FolderModelForm(request, parent_object, data=request.POST)
+    fid = request.POST.get('fid', '')  # 修改文件夹名称时，要带着文件夹id，以便知道修改的是数据库中的哪一条
+    # edit_object = None
+    if fid.isdecimal():  # fid存在，表明用户想要修改文件夹名
+        edit_object = models.FileRepository.objects.filter(file_type=2,
+                                                           project=request.tracer.project,
+                                                           id=int(fid)).first()
+        # if edit_object:
+        form = FolderModelForm(request, parent_object, data=request.POST, instance=edit_object)
+    else:  # fid不存在时，说明用户在新建文件夹
+        form = FolderModelForm(request, parent_object, data=request.POST)
+
     if form.is_valid():
         form.instance.project = request.tracer.project
         form.instance.update_user = request.tracer.user

@@ -79,8 +79,17 @@
                         <td>{{ item.update_user.username }}</td>
                         <td>{{ item.update_datetime }}</td>
                         <td>
-                            编辑
-                            删除
+                            {% if item.file_type == 2 %}
+                                <a data-toggle="modal"
+                                   data-target="#addModal"
+                                   data-name="{{ item.name }}"
+                                   data-fid="{{ item.id }}"
+                                   data-whatever="修改名称">
+                                    <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                                </a>
+                            {% endif %}
+                            |
+                            <a href="">删除</a>
                         </td>
                     </tr>
                 {% endfor %}
@@ -101,6 +110,7 @@
                 <div class="modal-body">
                     <form id="form">
                         {% csrf_token %}
+                        <input class="hide" type="text" name="fid" id="fid"> <!--隐藏的输入框，用于携带文件夹id-->
                         {% for field in form %}
                             <div class="form-group">
                                 <label for="{{ field.id_for_label }}">{{ field.label }}</label>
@@ -134,12 +144,23 @@
                 var recipient = button.data('whatever') // 获取addModal所在标签的data-whatever属性
                 // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
                 // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
+                var name = button.data('name')
+                var fid = button.data('fid') // fid存在表示modal框为编辑文件夹名，不存在表示modal框为新建文件夹
                 var modal = $(this)
-                modal.find('.modal-title').text(recipient); // 在h4那个标签里自动填写左边的内容
-                modal.find('.error-msg').empty(); // 清除错误信息
-                // document.getElementById('form').reset(); // 清空表单内容
-                $('#form')[0].reset(); // 和上一行写法效果等价。
-                // modal.find('.modal-body input').val(recipient) // 这一行可以定义表单内的输入框预设值，包括csrftoken也会被覆盖！
+
+                if (fid) {
+                    //编辑文件夹
+                    modal.find('#id_name').val(name);
+                    modal.find('#fid').val(fid); // 隐藏输入框里携带此信息
+                } else {
+                    //新建文件夹
+                    modal.find('.modal-title').text(recipient); // 在h4那个标签里自动填写左边的内容
+                    modal.find('.error-msg').empty(); // 清除错误信息
+                    // document.getElementById('form').reset(); // 清空表单内容
+                    $('#form')[0].reset(); // 和上一行写法效果等价。
+                    // modal.find('.modal-body input').val(recipient) // 这一行可以定义表单内的输入框预设值，包括csrftoken也会被覆盖！
+
+                }
             })
         }
 
