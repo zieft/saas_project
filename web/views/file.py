@@ -65,3 +65,25 @@ def file(request, project_id):
         return JsonResponse({'status': True})
 
     return JsonResponse({"status": False, 'error': form.errors})
+
+
+# http://localhost:8000/manage/1/file/delete/?fid=1
+def file_delete(request, project_id):
+    """ 删除文件 """
+    fid = request.GET.get('fid')
+    # 两个步骤
+    # 删除 数据库中 文件 & 文件夹下面的子文件（夹）。 级联删除
+    # 删除cos中对应的文件
+
+    # 去除待删除的对象
+    delete_object = models.FileRepository.objects.filter(id=fid, project=request.tracer.project).first()
+    # 判断对象是个文件，还是个文件夹
+    if delete_object.file_type == 1:  # 要删除的是个文件
+        # 删除数据库中的文件记录，cos中的具体文件，项目已使用的空间容量，
+        pass
+    else:  # 要删除的是个文件夹
+        # 找到文件夹下所有的文件，遍历上边删除文件的过程
+        pass
+
+    delete_object.delete()
+    return JsonResponse({'status': True})

@@ -37,6 +37,7 @@ urlpatterns = [
         url(r'^setting/$', manage.setting, name='setting'),
 
         url(r'^file/$', file.file, name='file'),
+        url(r'^file/delete/$', file.file_delete, name='file_delete'),
 
     ])),
 

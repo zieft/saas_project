@@ -80,7 +80,8 @@
                         <td>{{ item.update_datetime }}</td>
                         <td>
                             {% if item.file_type == 2 %}
-                                <a data-toggle="modal"
+                                <a href=""
+                                   data-toggle="modal"
                                    data-target="#addModal"
                                    data-name="{{ item.name }}"
                                    data-fid="{{ item.id }}"
@@ -89,7 +90,14 @@
                                 </a>
                             {% endif %}
                             |
-                            <a href="">删除</a>
+                            <a href=""
+                               data-toggle="modal"
+                               data-target="#alertModal"
+                               data-fid="{{ item.id }}"
+                               style="color:red;">
+                                <i class="fa fa-trash" aria-hidden="true"></i>
+
+                            </a>
                         </td>
                     </tr>
                 {% endfor %}
@@ -98,7 +106,7 @@
         </div>
     </div>
 
-    <!-- Modal -->
+    <!-- Modal 添加&编辑 -->
     <div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -127,15 +135,34 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal 删除 -->
+    <div class="modal fade" id="alertModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="alert alert-danger alert-dismissible fade in" role="alert">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">×</span></button>
+                <h4>确定删除？</h4>
+                <p>文件夹内包含的所有文件都会被删除！</p>
+                <p style="text-align: right;">
+                    <a class="btn btn-default btn-sm" data-dismiss="modal" aria-label="close">取 消</a>
+                    <button id="btnDelete" type="button" class="btn btn-danger">确 定</button>
+                </p>
+            </div>
+        </div>
+    </div>
 {% endblock %}
 
 {% block js %}
     <script>
 
         var FOLDER_URL = '{% url 'file' project_id=request.tracer.project.id %}';
+        var FILE_DELETE_URL = '{% url 'file_delete' project_id=request.tracer.project.id %}';
+
         $(function () {
             initAddModal();
             bindModelSubmit();
+            bindDeleteSubmit();
         });
 
         function initAddModal() {
@@ -162,6 +189,14 @@
 
                 }
             })
+
+            $('#alertModal').on('show.bs.modal', function (event) {
+                var button = $(event.relatedTarget) // Button that triggered the modal
+                var fid = button.data('fid')  // fid来自于trigger这个modal框的button，所以也是在那个button的a标签中从后端获取fid
+                $('#btnDelete').attr('fid', fid); // 给btnDelete按钮（就是确定按钮）添加一个 fid=fid 的属性，这个id用于ajax中拼接url
+
+            })
+
         }
 
         function bindModelSubmit() {
@@ -179,6 +214,21 @@
                                 $("#id_" + key).next().text(value[0]);
                             })
                         }
+                    }
+                })
+            })
+        }
+
+        function bindDeleteSubmit() {
+            $('#btnDelete').click(function () {
+                // 获取要删除的id
+                $.ajax({
+                    url: FILE_DELETE_URL,
+                    type: 'GET',
+                    data: {fid: $(this).attr('fid')},
+                    success: function (res) {
+                        console.log(res);
+                        location.reload();
                     }
                 })
             })
