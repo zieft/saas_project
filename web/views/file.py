@@ -2,7 +2,7 @@ from django.forms import model_to_dict
 from django.http import JsonResponse
 from django.shortcuts import render
 
-from utils.tencent.cos import delete_file, delete_file_list
+from utils.tencent.cos import delete_file, delete_file_list, credential
 from web import models
 from web.forms.file import FolderModelForm
 
@@ -132,3 +132,10 @@ def file_delete(request, project_id):
 
         # 级联删除数据库中的文件记录
         delete_object.delete()
+
+
+def cos_credential(request, project_id):
+    """ 获取cos上传临时凭证 """
+    data_dict = credential(request.tracer.project.bucket, request.tracer.project.region)
+
+    return JsonResponse(data_dict)

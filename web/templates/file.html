@@ -1,4 +1,5 @@
 {% extends 'layout/manage.html' %}
+{% load static %}
 {% block css %}
     <style>
         .panel-default .panel-heading {
@@ -175,10 +176,31 @@
 {% endblock %}
 
 {% block js %}
+    <script src="{% static 'js/cos-js-sdk-v5.min.js' %}"></script>
     <script>
-
         var FOLDER_URL = '{% url 'file' project_id=request.tracer.project.id %}';
         var FILE_DELETE_URL = '{% url 'file_delete' project_id=request.tracer.project.id %}';
+        var COS_CREDENTIAL = "{% url 'cos_credential' project_id=request.tracer.project.id %}";
+
+        var COS_OBJECT = new COS({
+            getAuthorization: function (options, callback) {
+                // 向django后台发送请求，获取临时凭证
+                // 相当于$.ajax({type:"GET"})
+                $.get(COS_CREDENTIAL, {
+                    // 可从options取需要的参数
+                }, function (data) {
+                    var credentials = data && data.credentials;
+                    if (!data || !credentials) return console.error("credentials invalid");
+                    callback({
+                        TmpSecretId: credentials.tmpSecretId,
+                        TmpSecretKey: credentials.tmpSecretKey,
+                        XCosSecurityToken: credentials.sessionToken,
+                        StartTime: data.startTime,
+                        ExpiredTime: data.expiredTime,
+                    });
+                });
+            }
+        });
 
         $(function () {
             initAddModal();
@@ -260,10 +282,21 @@
             $('#uploadFile').change(function () {
                 var fileList = $(this)[0].files;
                 $.each(fileList, function (index, fileObject) {
-                    console.log((fileObject.name));
+                    var fileName = fileObject.name;
+                    // 上传文件（异步）
+                    COS_OBJECT.putObject({
+                        Bucket: '{{ request.tracer.project.bucket }}',
+                        Region: '{{ request.tracer.project.region }}',
+                        Key: fileName,
+                        Body: fileObject,
+                        onProgress: function (progressData) {
+                            console.log("文件上传进度---->", fileName, JSON.stringify(progressData));
+                        }
+                    }, function (err, data) {
+                        console.log(err || data);
+                    });
                 })
             });
-
         }
     </script>
 {% endblock %}

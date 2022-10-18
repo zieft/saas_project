@@ -70,3 +70,32 @@ def delete_file_list(bucket, region, key_list):
         Bucket=bucket,
         Delete=objects
     )
+
+
+def credential(bucket, region):
+    # 生成一个临时凭证，并给前端返回
+    # 1. 安装一个生成临时凭证的python模块 pip install -U qcloud-python-sts
+    from sts.sts import Sts
+
+    config = {
+        'duration_seconds': 1800,
+        'secret_id': secret_id,
+        'secret_key': secret_key,
+        'bucket': bucket,
+        'region': region,
+        'allow_prefix': '*',
+        # 密钥的权限列表：
+        'allow_actions': [
+            # 'name/cosLPostObject',
+            # 'name/cos:DeleteObject',
+            # 'name/cos:UploadPart',
+            # 'name/cos:UploadPartCopy',
+            # 'name/cos:CompleteMultipartUpload',
+            # 'name/cos:AbortMultipartUpload',
+            "*",  # 所有的操作权限都支持
+        ]
+    }
+    sts = Sts(config)
+
+    result_dict = sts.get_credential()
+    return result_dict

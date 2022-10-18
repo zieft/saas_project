@@ -38,6 +38,7 @@ urlpatterns = [
 
         url(r'^file/$', file.file, name='file'),
         url(r'^file/delete/$', file.file_delete, name='file_delete'),
+        url(r'^cos/credential/$', file.cos_credential, name='cos_credential'),
 
     ])),
 
