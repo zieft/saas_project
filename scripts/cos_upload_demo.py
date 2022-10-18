@@ -24,3 +24,9 @@ response = client.create_bucket(
     Bucket='examplebucket-1250000000',
     ACL='public-read',  # private, public-read, public-read-write
 )
+
+# 删除文件
+client.delete_object(
+    Bucket='saasbucket-1314123611',
+    Key='p1.py',
+)

@@ -2,6 +2,7 @@ from django.forms import model_to_dict
 from django.http import JsonResponse
 from django.shortcuts import render
 
+from utils.tencent.cos import delete_file, delete_file_list
 from web import models
 from web.forms.file import FolderModelForm
 
@@ -80,10 +81,54 @@ def file_delete(request, project_id):
     # 判断对象是个文件，还是个文件夹
     if delete_object.file_type == 1:  # 要删除的是个文件
         # 删除数据库中的文件记录，cos中的具体文件，项目已使用的空间容量，
-        pass
+        # delete_object.file_size  # 单位：字节
+
+        # 释放当前项目已使用的空间
+        request.tracer.project.use_space -= delete_object.file_size
+        request.tracer.project.save()
+
+        # cos中删除文件
+        delete_file(request.tracer.project.bucket, request.tracer.project.region, delete_object.key)
+
+        # db中删除文件记录
+        delete_object.delete()
+        return JsonResponse({'status': True})
+
     else:  # 要删除的是个文件夹
         # 找到文件夹下所有的文件，遍历上边删除文件的过程
-        pass
+        # models.FileRepository.objects.filter(parent=delete_object)
+        total_size = 0
+        folder_list = [delete_object, ]
+        key_list = []  # 用于cos批量删除
+        """
+        在循环一个列表的过程中，向列表中append新元素，新元素也会被循环到！
+        list = [1, ]
+        for i in list:
+            list.append(i+1)
+            print(i)
+        上面这个循环是死循环，打印自然数列。
+        """
+        for folder in folder_list:
+            # 拿到当前文件夹下的所有文件及文件夹，并按文件夹在上的顺序排序
+            child_list = models.FileRepository.objects.filter(project=request.tracer.project, parent=folder).order_by(
+                '-file_type')
+            for child in child_list:
+                if child.file_type == 2:  # 是文件夹
+                    folder_list.append(child)
+                else:  # 是文件
+                    #  文件大小汇总
+                    total_size += child.file_size
+                    # 加入到cos待删除文件列表
+                    key_list.append({'Key': child.key})  # cos批量删除要求构建成这样
 
-    delete_object.delete()
-    return JsonResponse({'status': True})
+        # cos批量删除
+        if key_list:
+            delete_file_list(request.tracer.project.bucket, request.tracer.project.region, key_list)
+
+        # 释放容量
+        if total_size:
+            request.tracer.project.use_space -= total_size
+            request.tracer.project.save()
+
+        # 级联删除数据库中的文件记录
+        delete_object.delete()

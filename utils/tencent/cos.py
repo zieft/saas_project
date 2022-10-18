@@ -44,3 +44,29 @@ def upload_file(bucket, region, file_object, key):
     )
 
     return "https://{}.cos.{}.myqcloud.com/{}".format(bucket, region, key)
+
+
+def delete_file(bucket, region, key):
+    config = CosConfig(Region=region, SecretId=secret_id, SecretKey=secret_key)
+    client = CosS3Client(config)
+
+    # 根据文件大小自动选择简单上传或分块上传，分块上传具备断点续传功能。
+    client.delete_object(
+        Bucket=bucket,
+        Key=key,  # 筒内保存的文件名
+    )
+
+
+def delete_file_list(bucket, region, key_list):
+    config = CosConfig(Region=region, SecretId=secret_id, SecretKey=secret_key)
+    client = CosS3Client(config)
+    objects = {
+        'Quiet': 'true',
+        'object': key_list
+    }
+
+    # 根据文件大小自动选择简单上传或分块上传，分块上传具备断点续传功能。
+    client.delete_objects(
+        Bucket=bucket,
+        Delete=objects
+    )
