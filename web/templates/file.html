@@ -355,7 +355,7 @@
                     COS_OBJECT.putObject({
                         Bucket: '{{ request.tracer.project.bucket }}',
                         Region: '{{ request.tracer.project.region }}',
-                        Key: fileName,
+                        Key: key, // 桶内文件不再用原文件名来命名，改用key
                         Body: fileObject,
                         onProgress: function (progressData) { // progressData就是上传文件的时候，cos端返回来的状态对象，是个字典
                             // console.log("文件上传进度---->", fileName, JSON.stringify(progressData));

@@ -50,10 +50,9 @@ def delete_file(bucket, region, key):
     config = CosConfig(Region=region, SecretId=secret_id, SecretKey=secret_key)
     client = CosS3Client(config)
 
-    # 根据文件大小自动选择简单上传或分块上传，分块上传具备断点续传功能。
     client.delete_object(
         Bucket=bucket,
-        Key=key,  # 筒内保存的文件名
+        Key=key,  # 桶内保存的文件名
     )
 
 
@@ -99,3 +98,15 @@ def credential(bucket, region):
 
     result_dict = sts.get_credential()
     return result_dict
+
+
+def check_file(bucket, region, key):
+    config = CosConfig(Region=region, SecretId=secret_id, SecretKey=secret_key)
+    client = CosS3Client(config)
+
+    data = client.head_object(
+        Bucket=bucket,
+        Key=key,  # 桶内保存的文件名
+    )
+
+    return data

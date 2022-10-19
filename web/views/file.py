@@ -7,7 +7,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 from utils.tencent.cos import delete_file, delete_file_list, credential
 from web import models
-from web.forms.file import FolderModelForm
+from web.forms.file import FolderModelForm, FileModelForm
 
 
 def file(request, project_id):
@@ -197,12 +197,16 @@ def file_post(request, project_id):
     """ 将已上传成功的文件写入数据库 """
     """
     前端传来的POST中包含下面值：
-    name:       fileName,
-    key:        key,
-    file_size:  fileSize,
+    name:       fileName, 不能为空
+    key:        key, 不能为空
+    file_size:  fileSize, 不能为空
     parent:     CURRENT_FOLDER_ID,
-    etag:       data.ETag, 
+    etag:       data.ETag,  etag必须通过
     file_path:  data.Location
     """
+    form = FileModelForm(request, data=request.POST)
+    if form.is_valid():
+        pass
+
     print(request.POST)
     return JsonResponse({})
