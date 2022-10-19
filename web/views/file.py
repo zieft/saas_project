@@ -1,6 +1,9 @@
+import json
+
 from django.forms import model_to_dict
 from django.http import JsonResponse
 from django.shortcuts import render
+from django.views.decorators.csrf import csrf_exempt
 
 from utils.tencent.cos import delete_file, delete_file_list, credential
 from web import models
@@ -134,8 +137,55 @@ def file_delete(request, project_id):
         delete_object.delete()
 
 
+@csrf_exempt
 def cos_credential(request, project_id):
     """ 获取cos上传临时凭证 """
+    # print(request.POST) # 查看前端和请求临时凭证一同发过来的post请求
+    """
+    后端获取ajax数据的一般方法：
+    前端：
+    $.ajax({
+        ...
+        // 对于简单的键值对&列表，后端可以直接获取
+        data: {name:11, age:22, xx:[11, 22, 33]}
+        // 对于复杂的数据如 值为字典，或者值为列表中套列表，需要用JSON.stringfy来序列化一下
+        data:JSON.stringfy(name:{k1:1, k2:666}, xx:[11, 22, [33, 44,55]])
+    })
+    或者：
+    $.post(url, JSON.stringfy(complex_data)), function (response_data) {...})
+    
+    后端：
+    简单数据接收
+    request.POST.get('name')
+    request.POST.get('age')
+    request.POST.getlist('xx')
+    复杂数据接受：
+    request.body
+    info = json.loads(request.body.decode('utf-8'))
+    info['name]
+    info["xx"]
+    """
+    # print(request.body)
+    file_list = json.loads(request.body.decode('utf-8'))
+
+    # 从价格策略中获取单文件大小限制
+    per_file_limit = request.tracer.price_policy.per_file_size * 1024 * 1024  # 单文件大小限制，单位：M，换算成B
+    total_limit = request.tracer.price_policy.project_space * 1024 * 1024  # 总文件大小限制，单位：M，换算成B
+    # 统计所有文件大小
+    total_size = 0
+
+    # 验证单文件大小
+    for item in file_list:
+        if item['size'] > per_file_limit:  # 字节 单位：B， 与M相差 1024*1024 倍
+            msg = '单文件（{}）大小超出限制（最大{}M），请升级套餐。'.format(item['name'],
+                                                                       request.tracer.price_policy.per_file_size)
+            return JsonResponse({'status': False, 'error': msg})
+
+    # 验证总文件大小
+    used_space = request.tracer.project.use_space  # 项目已使用的空间，单位M
+    if used_space + total_size > total_limit:
+        return JsonResponse({'status': False, 'error': '总容量超出限制，请购买升级套餐。'})
+
     data_dict = credential(request.tracer.project.bucket, request.tracer.project.region)
 
-    return JsonResponse(data_dict)
+    return JsonResponse({'status': True, 'data': data_dict})

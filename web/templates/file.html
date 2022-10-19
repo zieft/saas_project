@@ -182,25 +182,7 @@
         var FILE_DELETE_URL = '{% url 'file_delete' project_id=request.tracer.project.id %}';
         var COS_CREDENTIAL = "{% url 'cos_credential' project_id=request.tracer.project.id %}";
 
-        var COS_OBJECT = new COS({
-            getAuthorization: function (options, callback) {
-                // 向django后台发送请求，获取临时凭证
-                // 相当于$.ajax({type:"GET"})
-                $.get(COS_CREDENTIAL, {
-                    // 可从options取需要的参数
-                }, function (data) {
-                    var credentials = data && data.credentials;
-                    if (!data || !credentials) return console.error("credentials invalid");
-                    callback({
-                        TmpSecretId: credentials.tmpSecretId,
-                        TmpSecretKey: credentials.tmpSecretKey,
-                        XCosSecurityToken: credentials.sessionToken,
-                        StartTime: data.startTime,
-                        ExpiredTime: data.expiredTime,
-                    });
-                });
-            }
-        });
+        // cos_object移到函数内部，因为我们想要通过请求临时凭证的同时，用post方法向后台传文件的大小，以便实现限制容量的功能
 
         $(function () {
             initAddModal();
@@ -280,9 +262,44 @@
 
         function bindUploadFile() {
             $('#uploadFile').change(function () {
+
+
                 var fileList = $(this)[0].files;
+                // 获取本次要上传的没个文件的名称和大小，列表中的每个字典代表一个文件
+                var checkFileList = [];
                 $.each(fileList, function (index, fileObject) {
+                    // console.log(fileObject)  //可以在console里查看文件对象所包含的属性，有name、size等
                     var fileName = fileObject.name;
+                    checkFileList.push({         // 向列表中添加一个字典元素
+                        'name': fileObject.name,
+                        'size': fileObject.size
+                    })
+
+                    // COS_OBJECT拿到下面来
+                    // 把这些数据（name, size）发送到django后台：django后台进行容量校验，如果没有问题，则返回临时凭证，否则返回错误信息
+                    var COS_OBJECT = new COS({
+                        getAuthorization: function (options, callback) {
+                            // 向django后台发送请求，获取临时凭证
+                            // 相当于$.ajax({type:"GET"})
+                            // 改成$.post就相当于$.ajax({type:"POST"})
+                            // 注意这里用的是$.post($.ajax的简写式)，url,data,callback都是位置参数
+                            $.post(COS_CREDENTIAL, JSON.stringify(checkFileList), function (res) {
+                                if (res.status) {
+                                    var credentials = res.data && res.data.credentials;
+                                    callback({
+                                        TmpSecretId: credentials.tmpSecretId,
+                                        TmpSecretKey: credentials.tmpSecretKey,
+                                        XCosSecurityToken: credentials.sessionToken,
+                                        StartTime: res.data.startTime,
+                                        ExpiredTime: res.data.expiredTime,
+                                    });
+                                } else {
+                                    alert(res.error);
+                                }
+                            });
+                        }
+                    });
+
                     // 上传文件（异步）
                     COS_OBJECT.putObject({
                         Bucket: '{{ request.tracer.project.bucket }}',
@@ -295,6 +312,7 @@
                     }, function (err, data) {
                         console.log(err || data);
                     });
+
                 })
             });
         }
