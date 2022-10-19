@@ -119,6 +119,11 @@
                                    data-whatever="修改名称">
                                     <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
                                 </a>
+                            {% else %}
+                                <a href="{% url 'file_download' project_id=request.tracer.project.id file_id=item.id %}"
+                                   class="btn btn-default">
+                                    <i class="fa fa-cloud-download" aria-hidden="true"></i>
+                                </a>
                             {% endif %}
                             <a href=""
                                class="btn btn-danger delete"
@@ -227,9 +232,9 @@
                 <td class="username"></td>
                 <td class="datetime"></td>
                 <td>
-                    {#                    <a href="" class="btn btn-default download">#}
-                    {#                        <i class="fa fa-cloud-download" aria-hidden="true"></i>#}
-                    {#                    </a>#}
+                    <a href="" class="btn btn-default download">
+                        <i class="fa fa-cloud-download" aria-hidden="true"></i>
+                    </a>
                     <a href="" class="btn btn-danger delete" data-toggle="modal" data-target="#alertModal">
                         <i class="fa fa-trash" aria-hidden="true"></i>
                     </a>
@@ -413,6 +418,7 @@
                                 newTr.find('.username').text(res.data.username);
                                 newTr.find('.datetime').text(res.data.datetime);
                                 newTr.find('.delete').attr('data-fid', res.data.id); // 删除文件必须要带有fid
+                                newTr.find('.download').attr('href', res.data.download_url);
                                 $('#rowList').append(newTr)
 
                                 tr.remove() // 上传完毕后 关闭进入条框框

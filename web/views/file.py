@@ -3,6 +3,7 @@ import json
 from django.forms import model_to_dict
 from django.http import JsonResponse
 from django.shortcuts import render
+from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 
 from utils.tencent.cos import delete_file, delete_file_list, credential
@@ -232,7 +233,15 @@ def file_post(request, project_id):
             'file_size': instance.file_size,
             'username': instance.update_user.username,
             'datetime': instance.update_datetime,
+            'download_url': reverse('file_download', kwargs={
+                'project_id': project_id,
+                'file_id': instance.id
+            })
         }
         print(request.POST)
         return JsonResponse({'status': True, 'data': result})
     return JsonResponse({'status': False, 'data': form.errors})
+
+
+def file_download(request, project_id, file_id):
+    pass
