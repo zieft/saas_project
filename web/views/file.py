@@ -136,6 +136,7 @@ def file_delete(request, project_id):
 
         # 级联删除数据库中的文件记录
         delete_object.delete()
+        return JsonResponse({'status': True})
 
 
 @csrf_exempt
@@ -206,7 +207,32 @@ def file_post(request, project_id):
     """
     form = FileModelForm(request, data=request.POST)
     if form.is_valid():
-        pass
+        # 校验通过，写入数据库
+        # form.instance.file_type = 1
+        # form.instance.update_user = request.tracer.user
+        # instance = form.save()  # 添加成功后，获取到新添加的那个对象，
+        # 这个对象无法通过get_file_type_display获取choices的中文
 
-    print(request.POST)
-    return JsonResponse({})
+        data_dict = form.cleaned_data  # 验证通过后的数据字典
+        data_dict.pop('etag')  # etag没有定义在FileModelForm中，所以先剔除掉，剩下的部分直接传给models
+        data_dict.update({
+            'file_type': 1,
+            'update_user': request.tracer.user,
+            'project': request.tracer.project
+        })  # 原先字典中不存在的关键字段，也添加上
+        instance = models.FileRepository.objects.create(**data_dict)  # 通过这种方法写入数据库的前提是，字典里的keys要跟model中的字段一致
+
+        # 更新项目已使用空间
+        request.tracer.project.use_space += data_dict['file_size']  # 字节
+
+        result = {
+            'name': instance.name,
+            'id': instance.id,
+            # 'file_type': instance.get_file_type_display(),
+            'file_size': instance.file_size,
+            'username': instance.update_user.username,
+            'datetime': instance.update_datetime,
+        }
+        print(request.POST)
+        return JsonResponse({'status': True, 'data': result})
+    return JsonResponse({'status': False, 'data': form.errors})

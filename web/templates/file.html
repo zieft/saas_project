@@ -62,12 +62,12 @@
                 <!--右边-->
                 <div class="function">
                     {#                    <input type="file" multiple/>   <!--文件选择按钮-->#}
-                    <div class="btn btn-primary btn-xs upload" style="position: relative">
+                    <div class="btn btn-primary upload" style="position: relative">
                         <div><i class="fa fa-upload" aria-hidden="true"></i> 上传文件</div>
                         <!--input框无法通过样式更改外观，需要用另一个按钮放在下方，然后把input框变成透明-->
                         <input type="file" multiple name="uploadFile" id="uploadFile">
                     </div>
-                    <a href="#" type="button" class="btn btn-success btn-xs" data-toggle="modal"
+                    <a href="#" type="button" class="btn btn-success" data-toggle="modal"
                        data-target="#addModal" data-whatever="新建文件夹">
                         <i class="fa fa-plus-circle" aria-hidden="true"></i> 新建文件夹
                     </a>
@@ -85,7 +85,7 @@
                     <th>操作</th>
                 </tr>
                 </thead>
-                <tbody>
+                <tbody id="rowList">
                 {% for item in file_object_list %}
                     <tr>
                         <td>
@@ -111,6 +111,7 @@
                         <td>
                             {% if item.file_type == 2 %}
                                 <a href=""
+                                   class="btn btn-primary edit"
                                    data-toggle="modal"
                                    data-target="#addModal"
                                    data-name="{{ item.name }}"
@@ -119,12 +120,12 @@
                                     <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
                                 </a>
                             {% endif %}
-                            |
                             <a href=""
+                               class="btn btn-danger delete"
                                data-toggle="modal"
                                data-target="#alertModal"
                                data-fid="{{ item.id }}"
-                               style="color:red;">
+                               style="color:white;">
                                 <i class="fa fa-trash" aria-hidden="true"></i>
 
                             </a>
@@ -212,6 +213,29 @@
                 </tr>
             </table>
         </div>
+    </div>
+
+    <!-- 文件条目模板 -->
+    <div class="hide">
+        <table id="rowTpl">
+            <tr>
+                <td>
+                    <i class="fa fa-file" aria-hidden="true"></i>
+                    <span class="name"></span>
+                </td>
+                <td class="file_size"></td>
+                <td class="username"></td>
+                <td class="datetime"></td>
+                <td>
+                    {#                    <a href="" class="btn btn-default download">#}
+                    {#                        <i class="fa fa-cloud-download" aria-hidden="true"></i>#}
+                    {#                    </a>#}
+                    <a href="" class="btn btn-danger delete" data-toggle="modal" data-target="#alertModal">
+                        <i class="fa fa-trash" aria-hidden="true"></i>
+                    </a>
+                </td>
+            </tr>
+        </table>
     </div>
 
 {% endblock %}
@@ -381,7 +405,17 @@
                                 etag: data.ETag, //
                                 file_path: data.Location
                             }, function (res) {
-                                console.log(res);
+                                // console.log(res);
+                                // 在数据库中写入成功，将以添加的数据展示在页面上
+                                var newTr = $('#rowTpl').find('tr').clone();
+                                newTr.find('.name').text(res.data.name);
+                                newTr.find('.file_size').text(res.data.file_size);
+                                newTr.find('.username').text(res.data.username);
+                                newTr.find('.datetime').text(res.data.datetime);
+                                newTr.find('.delete').attr('data-fid', res.data.id); // 删除文件必须要带有fid
+                                $('#rowList').append(newTr)
+
+                                tr.remove() // 上传完毕后 关闭进入条框框
                             })
                         } else {
                             // 上传失败

@@ -72,7 +72,8 @@ class FileModelForm(forms.ModelForm):
             self.add_error(key, '文件不存在')
             return self.cleaned_data
 
-        cos_etag = response.get('etag')
+        cos_etag = response.get('ETag')
+        print('etag:', etag, '\ncos_etag: ', cos_etag)
         if etag != cos_etag:
             self.add_error('etag', 'ETag异常')
         cos_length = response.get('Content-Length')

@@ -81,7 +81,7 @@ class Project(models.Model):
     name = models.CharField(verbose_name='项目名称', max_length=32)
     color = models.SmallIntegerField(verbose_name='颜色', choices=COLOR_CHOICES, default=1)
     desc = models.CharField(verbose_name='项目描述', max_length=255, null=True, blank=True)
-    use_space = models.IntegerField(verbose_name='已使用空间', default=0)
+    use_space = models.BigIntegerField(verbose_name='已使用空间', default=0)
     star = models.BooleanField(verbose_name='星标', default=False)
 
     join_count = models.SmallIntegerField(verbose_name='参与人数', default=1)
@@ -134,7 +134,7 @@ class Wiki(models.Model):
 
 class FileRepository(models.Model):
     ''' 文件库 '''
-    project = models.ForeignKey(verbose_name='项目', to='project')
+    project = models.ForeignKey(verbose_name='项目', to='Project')
     file_type_choice = (
         (1, '文件'),
         (2, '文件夹'),
@@ -142,8 +142,12 @@ class FileRepository(models.Model):
     file_type = models.SmallIntegerField(verbose_name='类型', choices=file_type_choice)
     name = models.CharField(verbose_name='文件夹名称', max_length=32, help_text='文件/文件夹名')
     key = models.CharField(verbose_name='文件储存在cos中的key', max_length=128, null=True, blank=True)
-    file_size = models.IntegerField(verbose_name='文件大小', null=True, blank=True)
+
+    # int类型最大表示的数据为 21亿，大概3个g
+    file_size = models.IntegerField(verbose_name='文件大小', null=True, blank=True, help_text='字节')
+
     file_path = models.CharField(verbose_name='文件路径', max_length=255, null=True, blank=True)
+
     parent = models.ForeignKey(verbose_name='父级目录', to='self', related_name='child', null=True, blank=True)
 
     update_user = models.ForeignKey(verbose_name='最近更新者', to='UserInfo')
