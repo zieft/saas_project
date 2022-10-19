@@ -1,7 +1,8 @@
 import json
 
+import requests
 from django.forms import model_to_dict
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
@@ -244,4 +245,14 @@ def file_post(request, project_id):
 
 
 def file_download(request, project_id, file_id):
-    pass
+    # 从COS获取待下载的文件内容
+
+    file_object = models.FileRepository.objects.filter(id=file_id, project_id=project_id).first()
+    res = requests.get(file_object.file_path)
+    data = res.content
+    response = HttpResponse(data)
+    # 配置响应头
+    # 浏览器只要看到这个响应头，就会下载这个文件
+    response['Content-Disposition'] = "attachment; filename={}".format(file_object.name)
+
+    return response
