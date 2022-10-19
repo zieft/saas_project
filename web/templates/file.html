@@ -222,6 +222,8 @@
         var FOLDER_URL = '{% url 'file' project_id=request.tracer.project.id %}';
         var FILE_DELETE_URL = '{% url 'file_delete' project_id=request.tracer.project.id %}';
         var COS_CREDENTIAL = "{% url 'cos_credential' project_id=request.tracer.project.id %}";
+        var FILE_POST_URL = '{% url 'file_post' project_id=request.tracer.project.id %}';
+        var CURRENT_FOLDER_ID = '{{ folder_object.id }}'
 
         // cos_object移到函数内部，因为我们想要通过请求临时凭证的同时，用post方法向后台传文件的大小，以便实现限制容量的功能
 
@@ -263,7 +265,6 @@
                 $('#btnDelete').attr('fid', fid); // 给btnDelete按钮（就是确定按钮）添加一个 fid=fid 的属性，这个id用于ajax中拼接url
 
             })
-
         }
 
         function bindModelSubmit() {
@@ -309,6 +310,8 @@
                 $.each(fileList, function (index, fileObject) {
                     // console.log(fileObject)  //可以在console里查看文件对象所包含的属性，有name、size等
                     var fileName = fileObject.name;
+                    var fileSize = fileObject.size;
+                    var key = (new Date()).getTime() + '_' + fileName  // 生成一个唯一的key。第一个括号表示立刻执行函数
                     checkFileList.push({         // 向列表中添加一个字典元素
                         'name': fileObject.name,
                         'size': fileObject.size
@@ -364,10 +367,28 @@
 
                         }
                     }, function (err, data) {
+                        // 代码运行到这里，说明验证、上传全都已经成功了
+                        // cos服务端会返回一个状态对象data，里面存有状态码，对象在cos内的网址等信息
                         console.log(err || data);
+                        if (data && data.statusCode === 200) {
+                            // 上传成功，将本次上传的文件信息提交到后台
+                            // 当前文件已上传成功
+                            $.post(FILE_POST_URL, {
+                                name: fileName,
+                                key: key,
+                                file_size: fileSize,
+                                parent: CURRENT_FOLDER_ID,
+                                etag: data.ETag, //
+                                file_path: data.Location
+                            }, function (res) {
+                                console.log(res);
+                            })
+                        } else {
+                            // 上传失败
+                            tr.find('.progress-error').text('上传失败')
+
+                        }
                     });
-
-
                 })
             });
         }

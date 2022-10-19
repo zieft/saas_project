@@ -46,6 +46,7 @@ def file(request, project_id):
             'form': form,
             'file_object_list': file_object_list,
             'breadcrmb_list': breadcrumb_list,
+            'folder_object': parent_object
         }
         return render(request, 'file.html', context)
 
@@ -189,3 +190,19 @@ def cos_credential(request, project_id):
     data_dict = credential(request.tracer.project.bucket, request.tracer.project.region)
 
     return JsonResponse({'status': True, 'data': data_dict})
+
+
+@csrf_exempt
+def file_post(request, project_id):
+    """ 将已上传成功的文件写入数据库 """
+    """
+    前端传来的POST中包含下面值：
+    name:       fileName,
+    key:        key,
+    file_size:  fileSize,
+    parent:     CURRENT_FOLDER_ID,
+    etag:       data.ETag, 
+    file_path:  data.Location
+    """
+    print(request.POST)
+    return JsonResponse({})
