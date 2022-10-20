@@ -1,4 +1,7 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+
+from utils.tencent.cos import delete_bucket
+from web import models
 
 
 def setting(request, project_id):
@@ -18,8 +21,9 @@ def setting_delete(request, project_id):
         # 确保只有项目的创建者才可删除项目
         return render(request, 'setting_delete.html', {'error': '只有项目创建者可删除项目'})
 
-    # 1. 删除桶
-    # 1.1 删除桶中的文件： 找到并删除
-    # 1.2 删除桶中的所有碎片
-    # 1.3 删除桶
+    # 删除桶
+    delete_bucket(request.tracer.project.bucket, request.tracer.project.region)
     # 2. 删除项目
+    models.Project.objects.filter(id=request.tracer.project.id).delete()
+
+    return redirect('project_list')

@@ -110,3 +110,42 @@ def check_file(bucket, region, key):
     )
 
     return data
+
+
+def delete_bucket(bucket, region):
+    """ 删除桶 """
+
+    config = CosConfig(Region=region, SecretId=secret_id, SecretKey=secret_key)
+    client = CosS3Client(config)
+
+    # 删除所有文件
+    while True:
+        part_object = client.list_objects(bucket)  # 单次最多只能返回1000个文件
+        contents = part_object.get('Contents')  # contents有值说明还能从同能拿到待删除文件
+
+        if not contents:
+            # contents中没有值了，说明删干净了
+            break
+
+        objects = {
+            'Quiet': 'true',
+            'Object': [{'Key': item['Key']} for item in contents]
+        }
+        client.delete_objects(bucket, objects)
+
+        if part_object['IsTruncated'] == 'false':
+            break
+
+    # 删除所有碎片
+    while True:
+        part_uploads = client.list_multipart_uploads(bucket)
+        uploads = part_uploads.get('upload')
+        if not uploads:
+            break
+        for i in uploads:
+            client.abort_multipart_upload(bucket, i['Key'], i['UploadId'])
+        if part_uploads['IsTrancated'] == 'false':
+            break
+
+    # 删除桶
+    client.delete_bucket(bucket)
