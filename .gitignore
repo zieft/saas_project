@@ -8,3 +8,4 @@
 /web/static/plugin/editor-md/.gitignore
 /venv_win/
 /scripts/test.py
+/.idea/aws.xml
