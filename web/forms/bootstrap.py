@@ -8,5 +8,6 @@ class BootstrapForm(object):
         for name, field in self.fields.items():
             if name in self.bootstrap_class_exclude:
                 continue  # 跳过当前循环，也就是不运行下面两行直接进入下一个循环
-            field.widget.attrs['class'] = 'form-control'
+            old_class = field.widget.attrs.get('class', '')  # 拿到已经存在的class
+            field.widget.attrs['class'] = '{} form-control'.format(old_class)  # 在已经存在的class的基础上，添加新的class
             field.widget.attrs['placeholder'] = '请输入{}'.format(field.label)

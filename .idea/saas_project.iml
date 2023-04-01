@@ -20,13 +20,14 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="bootstrap-datepicker" level="application" />
     <orderEntry type="library" name="bootstrap-datepicker.zh-CN" level="application" />
+    <orderEntry type="library" name="bootstrap-select" level="application" />
   </component>
   <component name="TemplatesService">
     <option name="TEMPLATE_CONFIGURATION" value="Django" />
     <option name="TEMPLATE_FOLDERS">
       <list>
-        <option value="$MODULE_DIR$/web/static" />
-      </list>
+        <opton value="$MODULE_DIR$/web/static" />
+      </list>i
     </option>
   </component>
 </module>
