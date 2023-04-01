@@ -1,6 +1,8 @@
 {% extends 'layout/manage.html' %}
+{% load static %}
 
 {% block css %}
+    <link rel="stylesheet" href="{% static 'plugin/editor-md/css/editormd.min.css' %}">
     <style>
         .issues-list .number {
             width: 100px;
@@ -168,3 +170,35 @@
     </div>
 {% endblock %}
 
+{% block js %}
+    <script src="{% static 'plugin/editor-md/editormd.min.js' %}"></script>
+    <script>
+        var WIKI_UPLOAD_URL = "{% url 'wiki_upload' project_id=request.tracer.project.id %}";
+
+        $(function () {
+            // initEditorMd();
+            bindBootStrapShownEvent();
+        });
+
+        function bindBootStrapShownEvent() {
+            $('#addModal').on('shown.bs.modal', function (event) {
+                // 单击新建问题按钮后，弹出的MD编辑器不可编辑，是因为bootstrap跟markdown有一些不兼容
+                // 通过这个函数，可以解决这个问题
+                // 对话框弹出时，内容触发
+                initEditorMd();
+            })
+        }
+
+        function initEditorMd() {
+            // 第一个参数就是需要应用editor的标签id
+            editormd('editor', {
+                placeholder: "请输入内容",
+                height: 500,
+                path: "{% static 'plugin/editor-md/lib/' %}",
+                imageUpload: true, // 使能上传本地图片
+                imageFormats: ['jpg', 'jpeg', 'png', 'gif'],
+                imageUploadURL: WIKI_UPLOAD_URL, // 上传到哪个地址
+            })
+        }
+    </script>
+{% endblock %}
