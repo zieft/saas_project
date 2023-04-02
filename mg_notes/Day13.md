@@ -28,3 +28,29 @@
 | 2    | 第二期 |
 | 3    | 第三期 |
 
+## 新建问题
+
+#### 模态对话框
+
+- 显示对话框
+- 显示供用户填写的biao'da
+
+前端插件：
+
+- bootstrap-datepicker
+
+```
+css
+js
+js找到标签处理
+```
+
+- bootstrap-select
+
+```
+css
+js
+ModelForm中添加属性
+```
+
+## 问题列表
