@@ -48,7 +48,7 @@ def project_list(request):
     if form.is_valid():
         porject_name = form.cleaned_data.get('name')
         # 验证通过: 项目名、颜色、描述 + 创建者（当前登录的用户）
-        # 为项目创建一个桶
+        # 1.为项目创建一个桶
         # 桶名里不能有中文，所以加入项目名称不是好主意
         bucket = '{}-{}-{}'.format(request.tracer.user.mobile_phone,
                                    str(int(time.time())),
@@ -57,6 +57,7 @@ def project_list(request):
         region = settings.COS_REGION
         create_bucket(bucket)
 
+        # 2.创建项目
         form.instance.region = region
         form.instance.bucket = bucket
 
@@ -64,7 +65,14 @@ def project_list(request):
         form.instance.creator = request.tracer.user
 
         # 创建项目
-        form.save()
+        instance = form.save()
+
+        # 3.项目初始化问题类型
+        issues_type_object_list = []
+        for item in models.IssuesType.PROJECT_INIT_LIST:  # ['任务', '功能', 'Bug']
+            issues_type_object_list.append(models.IssuesType(project=instance, title=item))
+        models.IssuesType.objects.bulk_create(issues_type_object_list)
+
         return JsonResponse({'status': True})
 
     return JsonResponse({'status': False, 'error': form.errors})
