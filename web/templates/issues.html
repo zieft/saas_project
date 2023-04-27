@@ -1,6 +1,6 @@
 {% extends 'layout/manage.html' %}
 {% load static %}
-
+{% load issues %}
 {% block css %}
     <link rel="stylesheet" href="{% static 'plugin/editor-md/css/editormd.min.css' %}">
     <link href="https://cdn.bootcdn.net/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css"
@@ -75,7 +75,7 @@
                         <tr>
                             <td class="number">
                                 <i class="fa fa-circle text-{{ item.priority }}"></i>
-                                <a target="_blank" href="#">#{{ item.id }}</a>
+                                <a target="_blank" href="#">{% string_just item.id %}</a>
                             </td>
                             <td class="issue">
                                 <div>
