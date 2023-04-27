@@ -70,34 +70,46 @@
                     <a href="#" class="btn btn-primary btn-sm" data-toggle="modal" data-target="">邀请成员</a>
                 </div>
                 <table class="table">
-                    <tbody class="issues-list">
-                    <tr>
-                        <td class="number">
-                            <i class="fa fa-circle text-danger"></i>
-                            <a target="_blank" href="/manage/27/issues/detail/10">#010</a>
-                        </td>
-                        <td class="issue">
-                            <div>
-                                <a target="_blank" href="/manage/27/issues/detail/10">测试</a>
-                            </div>
-                            <div class="tags">
-                                <span class="type"
-                                      style="background-color: #56b8eb; border-radius: 5px; padding: 1px 5px">
-                                    功能
-                                </span>
-                                <span>
-                                    <i class="fa fa-refresh" aria-hidden="true"></i> 已解决
-                                </span>
-                                <span>
-                                    <i class="fa fa-user-o" aria-hidden="true"></i> zieft
-                                </span>
-                                <span>
-                                    <i class="fa fa-clock-o" aria-hidden="true"></i> 2023年3月31日 14:25 更新
-                                </span>
-                            </div>
-                        </td>
-                    </tr>
-                    </tbody>
+                    {% for item in issues_object_list %}
+                        <tbody class="issues-list">
+                        <tr>
+                            <td class="number">
+                                <i class="fa fa-circle text-{{ item.priority }}"></i>
+                                <a target="_blank" href="#">#{{ item.id }}</a>
+                            </td>
+                            <td class="issue">
+                                <div>
+                                    <a target="_blank" href="#">{{ item.subject }}</a>
+                                </div>
+                                <div class="tags">
+                                    <span class="type"
+                                          style="background-color: #56b8eb; border-radius: 5px; padding: 1px 5px; color: white">
+                                        {{ item.issues_type.title }}
+                                    </span>
+                                    <span>
+                                        <i class="fa fa-refresh" aria-hidden="true"></i>
+                                        {{ item.get_status_display }}
+                                    </span>
+                                    <span>
+                                        <i class="fa fa-hand-o-right" aria-hidden="true"></i>
+                                        {{ item.assign.username }}
+                                    </span>
+                                    <span>
+                                        <i class="fa fa-user-o" aria-hidden="true"></i>
+                                        {{ item.creator.username }}
+                                    </span>
+                                    <span>
+                                        <i class="fa fa-clock-o" aria-hidden="true"></i> {{ item.end_date }} 截止
+                                    </span>
+                                    <span>
+                                        <i class="fa fa-clock-o"
+                                           aria-hidden="true"></i> {{ item.latest_update_datetime }} 更新
+                                    </span>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    {% endfor %}
                 </table>
             </div>
             <nav aria-label="...">
